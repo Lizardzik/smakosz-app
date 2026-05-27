@@ -1,8 +1,42 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Strona Główna";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+
+<div class="smakosz-main-content">
+
+    <div class="search-box-container">
+        <input type="text" class="search-box-input" placeholder="znajdź swój przepis" />
+    </div>
+
+    <div class="divider-line">filtry</div>
+
+    <div class="filters-flex-box">
+        <select class="custom-filter-select"><option>zupy </option></select>
+        <select class="custom-filter-select"><option>desery </option></select>
+        <select class="custom-filter-select"><option>obiady </option></select>
+        <select class="custom-filter-select"><option>typ diety </option></select>
+        <select class="custom-filter-select"><option>kalorie </option></select>
+        <select class="custom-filter-select"><option>kuchnia </option></select>
+    </div>
+
+    <main class="dishes-grid">
+        <div class="dish-item-card">
+            <img src="~/images/image.png" alt="Zupa" />
+        </div>
+        <div class="dish-item-card">
+            <img src="~/images/image (1).png" alt="Sushi" />
+        </div>
+        <div class="dish-item-card">
+            <img src="~/images/image (2).png" alt="Pizza" />
+        </div>
+        <div class="dish-item-card">
+            <img src="~/images/image (3).png" alt="Makaron" />
+        </div>
+    </main>
+
 </div>

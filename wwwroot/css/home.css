@@ -1,0 +1,103 @@
+﻿<style >
+.smakosz-main-content {
+    font-family: 'Montserrat', sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+
+.search-box-container {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 35px;
+}
+
+.search-box-input {
+    width: 100%;
+    max-width: 550px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    font-family: 'Montserrat', sans-serif;
+    border: 3px solid #2D3142;
+    border-radius: 30px;
+    background-color: transparent;
+    outline: none;
+    text-align: center;
+    color: #2D3142;
+}
+
+
+.divider-line {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px auto;
+    max-width: 850px;
+    color: #2D3142;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+}
+
+    .divider-line::before, .divider-line::after {
+        content: '';
+        flex: 1;
+        border-bottom: 2px solid #2D3142;
+    }
+
+    .divider-line:not(:empty)::before {
+        margin-right: 15px;
+    }
+
+    .divider-line:not(:empty)::after {
+        margin-left: 15px;
+    }
+
+
+.filters-flex-box {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+
+.custom-filter-select {
+    background-color: #f3e9dc;
+    border: 3px solid #2D3142;
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-size: 1.05rem;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    outline: none;
+    min-width: 140px;
+    text-align: center;
+    color: #2D3142;
+}
+
+
+.dishes-grid {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    justify-items: center;
+}
+
+.dish-item-card {
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+    .dish-item-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+</style >
