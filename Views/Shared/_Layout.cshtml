@@ -7,32 +7,53 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SmakoszApp.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SmakoszApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+    @if (ViewData["HideNav"] == null || !(bool)ViewData["HideNav"])
+    {
+        <header>
+            <nav class="custom-navbar">
+                <div class="container-fluid navbar-container px-3">
+
+                    <div class="nav-left">
+                        <a href="/Home/Index" class="nav-link">galeria</a>
+                        <a href="/Home/Contact" class="nav-link">kontakt</a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a href="/Recipe/Favorites" class="nav-link">ulubione</a>
+                        }
+                    </div>
+
+                    <div class="nav-center">
+                        <a href="/Home/Index" class="navbar-brand-text">smakosz</a>
+                    </div>
+
+                    <div class="nav-right">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a href="/Recipe/Add" class="nav-link">dodaj przepis</a>
+                            <a href="/Recipe/Edit" class="nav-link">edytuj przepis</a>
+                            <div class="dropdown">
+                                <a href="#" class="nav-link fw-bold dropdown-toggle" id="userMenu" data-bs-toggle="dropdown">@User.Identity.Name</a>
+                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu">
+                                    <li><a class="dropdown-item" href="/Account/Settings">ustawienia konta</a></li>
+                                    <li><a class="dropdown-item" href="/Account/Logout">wyloguj</a></li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="/Account/Index" class="nav-link">zaloguj się</a>
+                            <a href="/Account/Index" class="nav-link">zarejestruj się</a>
+                        }
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
+            </nav>
+        </header>
+    }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

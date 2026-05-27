@@ -29,3 +29,23 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+    --color-primary: #4F6D7A;
+    --color-accent: #C08552;
+    --color-bg-light: #F3E9DC;
+    --color-bg-mint: #9DBEBB;
+    --color-dark: #2D3142;
+}
+
+body {
+    background-color: var(--color-bg-light);
+    font-family: 'Montserrat', sans-serif;
+    color: var(--color-dark);
+}
+
+h1, h2, h3, h4, h5, h6, .logo-font {
+    font-family: 'Playfair Display', serif;
+}

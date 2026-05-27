@@ -1,0 +1,78 @@
+﻿.custom-navbar {
+    background-color: var(--color-primary);
+    width: 100%;
+    padding: 1.2rem 0;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.nav-left {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-right {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.navbar-brand-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-dark) !important;
+    text-decoration: none;
+    line-height: 1;
+    transition: opacity 0.2s ease;
+}
+
+    .navbar-brand-text:hover {
+        opacity: 0.8;
+    }
+
+.nav-link {
+    color: var(--color-dark) !important;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+    .nav-link:hover {
+        opacity: 0.7;
+    }
+
+.custom-dropdown-menu {
+    background-color: var(--color-bg-light);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-top: 15px;
+}
+
+.custom-dropdown-item {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--color-dark);
+    font-size: 1.1rem;
+    padding: 0.5rem 1.5rem;
+}
+
+    .custom-dropdown-item:hover {
+        background-color: var(--color-bg-mint);
+        color: var(--color-dark);
+    }

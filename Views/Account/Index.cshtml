@@ -1,0 +1,78 @@
+﻿@model SmakoszApp.Models.AccountViewModel
+
+@{
+    ViewData["Title"] = "Logowanie";
+    ViewData["HideNav"] = true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+}
+
+<div class="auth-container">
+
+    <div class="text-center">
+        <img src="~/transparentlogo.png" alt="Smakosz" class="auth-logo" />
+    </div>
+
+    <div id="loginForm" class="auth-card text-center">
+        <h2>Logowanie</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success rounded-pill mt-3" style="padding: 0.5rem 1rem;">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <div asp-validation-summary="All" class="text-danger mb-3 validation-summary-errors" style="font-weight: bold;"></div>
+        <form asp-action="Login" method="post">
+            <input type="text" class="auth-input" asp-for="Login" placeholder="login" required>
+            <input type="password" class="auth-input" asp-for="Password" placeholder="hasło" required>
+            <button type="submit" class="auth-btn">zaloguj się</button>
+        </form>
+
+        <div class="mt-4">
+            <a href="javascript:void(0)" onclick="toggleForms()" class="auth-link">Nie masz konta? Zarejestruj się</a>
+        </div>
+    </div>
+
+    <div id="registerForm" class="auth-card text-center d-none">
+        <h2>Rejestracja</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success rounded-pill mt-3" style="padding: 0.5rem 1rem;">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <div asp-validation-summary="All" class="text-danger mb-3 validation-summary-errors" style="font-weight: bold;"></div>
+        <form asp-action="Register" method="post">
+            <input type="email" class="auth-input" asp-for="Email" placeholder="e-mail" required>
+            <input type="text" class="auth-input" asp-for="Login" placeholder="login" required>
+            <input type="password" class="auth-input" asp-for="Password" placeholder="hasło" required>
+            <button type="submit" class="auth-btn">zarejestruj się</button>
+        </form>
+
+        <div class="mt-4">
+            <a href="javascript:void(0)" onclick="toggleForms()" class="auth-link">Masz już konto? Zaloguj się</a>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <a href="/Home/Index" class="btn btn-outline-dark rounded-pill px-4">Wejdź jako gość</a>
+    </div>
+
+</div>
+
+<script>
+    function toggleForms() {
+        var login = document.getElementById('loginForm');
+        var register = document.getElementById('registerForm');
+
+        if (login.classList.contains('d-none')) {
+            login.classList.remove('d-none');
+            register.classList.add('d-none');
+        } else {
+            login.classList.add('d-none');
+            register.classList.remove('d-none');
+        }
+    }
+</script>
