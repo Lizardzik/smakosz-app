@@ -1,0 +1,105 @@
+﻿@model SmakoszApp.Models.Recipe
+
+@{
+    ViewData["Title"] = "Edytuj Przepis";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/recipe-add.css" asp-append-version="true" />
+}
+
+<div class="add-recipe-container">
+    <form class="add-recipe-form" method="post" action="/Recipe/Edit/@Model.Id" enctype="multipart/form-data">
+
+        <div class="recipe-grid">
+            <div class="col-left">
+                <input type="text" name="Title" value="@Model.Title" class="title-input" placeholder="Wpisz nazwę przepisu" required />
+
+                <label class="image-upload-box" style="@(!string.IsNullOrEmpty(Model.ImagePath) ? $"background-image: url('{Model.ImagePath}'); background-size: cover; background-position: center;" : "")">
+                    <input type="file" name="ImageFile" accept="image/*" />
+                    <span class="plus-icon" style="@(!string.IsNullOrEmpty(Model.ImagePath) ? "display:none;" : "")">+</span>
+                    <span style="@(!string.IsNullOrEmpty(Model.ImagePath) ? "display:none;" : "")">zmień zdjęcie</span>
+                </label>
+            </div>
+
+            <div class="col-center">
+                <div class="ingredients-box">
+                    <div class="ingredients-header">
+                        <span class="box-title">składniki</span>
+                        <button type="button" class="add-ingredient-btn" id="addIngredientBtn">+ dodaj</button>
+                    </div>
+                    <div class="ingredients-list" id="ingredientsList">
+                        @if (Model.Ingredients != null && Model.Ingredients.Any())
+                        {
+                            foreach (var ing in Model.Ingredients)
+                            {
+                                <input type="text" name="IngredientsList" value="@ing.Name" placeholder="np. 2 jajka" class="ingredient-input" style="margin-bottom: 10px;" required />
+                            }
+                        }
+                        else
+                        {
+                            <input type="text" name="IngredientsList" placeholder="np. 2 jajka" class="ingredient-input" required />
+                        }
+                    </div>
+                </div>
+
+                <div class="details-box">
+                    <div class="time-input-wrapper">
+                        <span class="clock-icon">🕒</span>
+                        <input type="number" name="PrepTimeMinutes" value="@Model.PrepTimeMinutes" placeholder="czas przygotowania (min)" class="detail-input" required />
+                    </div>
+                    <div class="kcal-input-wrapper">
+                        <input type="number" name="Calories" value="@Model.Calories" placeholder="Wpisz kcal" class="detail-input kcal-input" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-right">
+                <textarea name="Instructions" class="instructions-input" placeholder="Wpisz sposób przygotowania" required>@Model.Instructions</textarea>
+            </div>
+        </div>
+
+        <div class="categories-section">
+            <p>Wybierz kategorie dla filtrów:</p>
+            <div class="categories-row">
+                <select class="custom-filter-select" name="MainCategory" id="mainCategorySelect">
+                    <option value="" disabled selected>Rodzaj dania</option>
+                    <option value="śniadania" selected="@(Model.MainCategory == "śniadania")">śniadania</option>
+                    <option value="obiady" selected="@(Model.MainCategory == "obiady")">obiady</option>
+                    <option value="desery" selected="@(Model.MainCategory == "desery")">desery</option>
+                </select>
+
+                <select class="custom-filter-select" name="SubCategory" id="subCategorySelect">
+                    <option value="" disabled selected>Podkategoria</option>
+                </select>
+
+                <select class="custom-filter-select" name="DietType">
+                    <option value="" disabled selected>Typ diety</option>
+                    <option value="wege" selected="@(Model.DietType == "wege")">wege</option>
+                    <option value="vegan" selected="@(Model.DietType == "vegan")">vegan</option>
+                    <option value="proteinowa" selected="@(Model.DietType == "proteinowa")">proteinowa</option>
+                    <option value="keto" selected="@(Model.DietType == "keto")">keto</option>
+                </select>
+
+                <select class="custom-filter-select" name="CuisineType">
+                    <option value="" disabled selected>Kuchnia</option>
+                    <option value="polska" selected="@(Model.CuisineType == "polska")">polska</option>
+                    <option value="włoska" selected="@(Model.CuisineType == "włoska")">włoska</option>
+                    <option value="grecka" selected="@(Model.CuisineType == "grecka")">grecka</option>
+                    <option value="azjatycka" selected="@(Model.CuisineType == "azjatycka")">azjatycka</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="submit-section">
+            <button type="submit" class="submit-recipe-btn">zapisz zmiany</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        window.existingSubCategory = '@Model.SubCategory';
+    </script>
+    <script src="~/js/recipe-edit.js" asp-append-version="true"></script>
+}

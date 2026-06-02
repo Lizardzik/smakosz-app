@@ -1,0 +1,57 @@
+﻿.page-title {
+    text-align: center;
+    color: var(--color-dark);
+    margin-bottom: 40px;
+}
+
+.empty-list-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-dark);
+}
+
+.card-details {
+    padding: 15px;
+    text-align: center;
+    background-color: var(--color-bg-light);
+}
+
+    .card-details h3 {
+        font-size: 1.1rem;
+        color: var(--color-dark);
+        margin-bottom: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.edit-link-btn, .delete-link-btn {
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+
+.edit-link-btn {
+    background-color: var(--color-dark);
+}
+
+.delete-link-btn {
+    background-color: #dc3545;
+}
+
+    .edit-link-btn:hover, .delete-link-btn:hover {
+        opacity: 0.8;
+        color: white;
+    }

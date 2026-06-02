@@ -57,22 +57,11 @@
     </div>
 
     <div class="mt-5 text-center">
-        <a href="/Home/Index" class="btn btn-outline-dark rounded-pill px-4">Wejdź jako gość</a>
+        <a href="/Account/Guest" class="btn btn-outline-dark rounded-pill px-4">Wejdź jako gość</a>
     </div>
 
 </div>
 
-<script>
-    function toggleForms() {
-        var login = document.getElementById('loginForm');
-        var register = document.getElementById('registerForm');
-
-        if (login.classList.contains('d-none')) {
-            login.classList.remove('d-none');
-            register.classList.add('d-none');
-        } else {
-            login.classList.add('d-none');
-            register.classList.remove('d-none');
-        }
-    }
-</script>
+@section Scripts {
+    <script src="~/js/account.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<SmakoszApp.Models.Recipe>
+
+@{
+    ViewData["Title"] = "Ulubione Przepisy";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<div class="smakosz-main-content">
+    <div class="divider-line" style="margin-top:20px; margin-bottom: 40px;">Twoje ulubione przepisy</div>
+
+    <div style="max-width: 850px; margin: 0 auto;">
+        @if (!Model.Any())
+        {
+            <p style="text-align:center; opacity:0.7;">Nie dodałeś jeszcze żadnego przepisu do ulubionych.</p>
+        }
+        else
+        {
+            <div class="dishes-grid">
+                @foreach (var recipe in Model)
+                {
+                    <div class="dish-item-card">
+                        <div class="dish-image-wrapper">
+                            <img src="@recipe.ImagePath" alt="@recipe.Title" />
+                            <div class="dish-hover-overlay">
+                                <span>🕒 @recipe.PrepTimeMinutes min</span>
+                                <span>🔥 @recipe.Calories kcal</span>
+                            </div>
+                        </div>
+                        <div class="dish-bottom-bar">
+                            <h4 class="dish-title" title="@recipe.Title">@recipe.Title</h4>
+                            <button type="button" class="favorite-btn active" data-id="@recipe.Id">♥</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/favorites.js" asp-append-version="true"></script>
+}

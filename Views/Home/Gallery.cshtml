@@ -1,0 +1,23 @@
+﻿@model IEnumerable<SmakoszApp.Models.Recipe>
+
+@{
+    ViewData["Title"] = "Galeria";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/gallery.css" asp-append-version="true" />
+}
+
+<div class="gallery-container">
+    <h2 class="gallery-title">Galeria potraw</h2>
+
+    <div class="gallery-grid">
+        @foreach (var recipe in Model)
+        {
+            <div class="gallery-item">
+                <img src="@recipe.ImagePath" alt="@recipe.Title" />
+                <div class="gallery-item-title" title="@recipe.Title">@recipe.Title</div>
+            </div>
+        }
+    </div>
+</div>

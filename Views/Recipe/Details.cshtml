@@ -1,0 +1,48 @@
+﻿@model SmakoszApp.Models.Recipe
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/recipe-details.css" asp-append-version="true" />
+}
+
+<div class="recipe-details-container">
+    <div class="details-top-section">
+        <div class="details-image-box">
+            <img src="@Model.ImagePath" alt="@Model.Title" />
+        </div>
+
+        <div class="details-info-box">
+            <h1 class="details-title">@Model.Title</h1>
+
+            <div class="details-meta">
+                <span>🕒 @Model.PrepTimeMinutes min</span>
+                <span>@Model.Calories kcal</span>
+            </div>
+
+            <div class="details-ingredients">
+                <h3>Składniki</h3>
+                <ul>
+                    @if (Model.Ingredients != null && Model.Ingredients.Any())
+                    {
+                        foreach (var ing in Model.Ingredients)
+                        {
+                            <li>@ing.Name</li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-instructions">
+        <h3>Sposób przygotowania</h3>
+        <p>@Model.Instructions</p>
+    </div>
+
+    <div class="details-actions">
+        <a href="/Home/Index" class="back-home-btn">wróć na stronę główną</a>
+    </div>
+</div>

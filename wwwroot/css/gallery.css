@@ -1,0 +1,15 @@
+﻿.gallery-title {
+    text-align: center;
+    color: var(--color-dark);
+    margin-bottom: 40px;
+}
+
+.gallery-item-title {
+    padding: 15px;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

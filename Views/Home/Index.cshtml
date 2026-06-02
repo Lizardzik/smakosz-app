@@ -1,42 +1,133 @@
-﻿@{
+﻿@model IEnumerable<SmakoszApp.Models.Recipe>
+
+@{
     ViewData["Title"] = "Strona Główna";
 }
+
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 }
 
-
-
 <div class="smakosz-main-content">
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="success-alert">
+            <span>@TempData["SuccessMessage"]</span>
+            <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    }
+
     <div class="search-box-container">
-        <input type="text" class="search-box-input" placeholder="znajdź swój przepis" />
+        <input type="text" class="search-box-input" id="searchInput" placeholder="znajdź swój przepis" />
     </div>
 
     <div class="divider-line">filtry</div>
 
     <div class="filters-flex-box">
-        <select class="custom-filter-select"><option>zupy </option></select>
-        <select class="custom-filter-select"><option>desery </option></select>
-        <select class="custom-filter-select"><option>obiady </option></select>
-        <select class="custom-filter-select"><option>typ diety </option></select>
-        <select class="custom-filter-select"><option>kalorie </option></select>
-        <select class="custom-filter-select"><option>kuchnia </option></select>
+        <div class="custom-dropdown">
+            <button class="custom-filter-btn" type="button">Rodzaj dania</button>
+            <div class="custom-dropdown-content">
+                <label class="radio-label"><input type="radio" name="MainCategory" value="śniadania"><span class="radio-circle"></span> śniadania</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="obiady"><span class="radio-circle"></span> obiady</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="desery"><span class="radio-circle"></span> desery</label>
+            </div>
+        </div>
+
+        <div class="custom-dropdown">
+            <button class="custom-filter-btn" type="button">Podkategoria</button>
+            <div class="custom-dropdown-content">
+                <label class="radio-label"><input type="radio" name="SubCategory" value="na słodko"><span class="radio-circle"></span> na słodko</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="na słono"><span class="radio-circle"></span> na słono</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="zupy"><span class="radio-circle"></span> zupy</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="makarony"><span class="radio-circle"></span> makarony</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="steki"><span class="radio-circle"></span> steki</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="sałatki"><span class="radio-circle"></span> sałatki</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="burgery"><span class="radio-circle"></span> burgery</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="ciasta"><span class="radio-circle"></span> ciasta</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="na zimno"><span class="radio-circle"></span> na zimno</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="puddingi"><span class="radio-circle"></span> puddingi</label>
+                <label class="radio-label"><input type="radio" name="SubCategory" value="mrożone"><span class="radio-circle"></span> mrożone</label>
+            </div>
+        </div>
+
+        <div class="custom-dropdown">
+            <button class="custom-filter-btn" type="button">Typ diety</button>
+            <div class="custom-dropdown-content">
+                <label class="radio-label"><input type="radio" name="DietType" value="wege"><span class="radio-circle"></span> wege</label>
+                <label class="radio-label"><input type="radio" name="DietType" value="vegan"><span class="radio-circle"></span> vegan</label>
+                <label class="radio-label"><input type="radio" name="DietType" value="proteinowa"><span class="radio-circle"></span> proteinowa</label>
+                <label class="radio-label"><input type="radio" name="DietType" value="keto"><span class="radio-circle"></span> keto</label>
+            </div>
+        </div>
+
+        <div class="custom-dropdown">
+            <button class="custom-filter-btn" type="button">Kuchnia</button>
+            <div class="custom-dropdown-content">
+                <label class="radio-label"><input type="radio" name="CuisineType" value="polska"><span class="radio-circle"></span> polska</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="włoska"><span class="radio-circle"></span> włoska</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="grecka"><span class="radio-circle"></span> grecka</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="azjatycka"><span class="radio-circle"></span> azjatycka</label>
+            </div>
+        </div>
     </div>
 
-    <main class="dishes-grid">
-        <div class="dish-item-card">
-            <img src="~/images/image.png" alt="Zupa" />
-        </div>
-        <div class="dish-item-card">
-            <img src="~/images/image (1).png" alt="Sushi" />
-        </div>
-        <div class="dish-item-card">
-            <img src="~/images/image (2).png" alt="Pizza" />
-        </div>
-        <div class="dish-item-card">
-            <img src="~/images/image (3).png" alt="Makaron" />
-        </div>
-    </main>
+    <div class="main-layout">
+        <aside class="active-filters-panel">
+            <h3>Wybrane filtry</h3>
+            <div id="active-filters-list">
+                <p class="empty-filters-text">Brak aktywnych filtrów</p>
+            </div>
+            <button type="button" id="reset-filters-btn" class="reset-filters-btn" style="display: none;">Wyczyść filtry</button>
+        </aside>
 
+        <main class="dishes-grid" id="recipesGrid">
+            @if (!Model.Any())
+            {
+                <p>Brak przepisów w bazie. Dodaj swój pierwszy przepis!</p>
+            }
+            else
+            {
+                foreach (var recipe in Model)
+                {
+                    <div class="dish-item-card"
+                         data-main="@recipe.MainCategory"
+                         data-sub="@recipe.SubCategory"
+                         data-diet="@recipe.DietType"
+                         data-cuisine="@recipe.CuisineType"
+                         data-title="@recipe.Title.ToLower()">
+
+                        <a href="/Recipe/Details/@recipe.Id" style="display: block; color: inherit; text-decoration: none;">
+                            <div class="dish-image-wrapper">
+                                <img src="@recipe.ImagePath" alt="@recipe.Title" />
+                                <div class="dish-hover-overlay">
+                                    <span>🕒 @recipe.PrepTimeMinutes min</span>
+                                    <span>@recipe.Calories kcal</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <div class="dish-bottom-bar">
+                            <a href="/Recipe/Details/@recipe.Id" style="color: inherit; text-decoration: none; overflow: hidden;">
+                                <h4 class="dish-title" title="@recipe.Title">@recipe.Title</h4>
+                            </a>
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                var favoriteIds = ViewBag.FavoriteIds as List<int> ?? new List<int>();
+                                var isFav = favoriteIds.Contains(recipe.Id);
+                                <button type="button" class="favorite-btn @(isFav ? "active" : "")" data-id="@recipe.Id">
+                                    @(isFav ? "♥" : "♡")
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+                }
+            }
+        </main>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

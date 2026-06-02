@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Dodaj Przepis";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/recipe-add.css" asp-append-version="true" />
+}
+
+<div class="add-recipe-container">
+    <form class="add-recipe-form" method="post" action="/Recipe/Add" enctype="multipart/form-data">
+
+        <div class="recipe-grid">
+            <div class="col-left">
+                <input type="text" name="Title" class="title-input" placeholder="Wpisz nazwę przepisu" required />
+                <label class="image-upload-box">
+                    <input type="file" name="ImageFile" accept="image/*" />
+                    <span class="plus-icon">+</span>
+                    <span>dodaj zdjęcie</span>
+                </label>
+            </div>
+
+            <div class="col-center">
+                <div class="ingredients-box">
+                    <div class="ingredients-header">
+                        <span class="box-title">składniki</span>
+                        <button type="button" class="add-ingredient-btn" id="addIngredientBtn">+ dodaj</button>
+                    </div>
+                    <div class="ingredients-list" id="ingredientsList">
+                        <input type="text" name="IngredientsList" placeholder="np. 2 jajka" class="ingredient-input" required />
+                    </div>
+                </div>
+
+                <div class="details-box">
+                    <div class="time-input-wrapper">
+                        <span class="clock-icon">🕒</span>
+                        <input type="number" name="PrepTimeMinutes" placeholder="wpisz czas przygotowania (min)" class="detail-input" required />
+                    </div>
+                    <div class="kcal-input-wrapper">
+                        <input type="number" name="Calories" placeholder="Wpisz kcal" class="detail-input kcal-input" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-right">
+                <textarea name="Instructions" class="instructions-input" placeholder="Wpisz sposób przygotowania" required></textarea>
+            </div>
+        </div>
+
+        <div class="categories-section">
+            <p>Wybierz kategorie dla filtrów:</p>
+            <div class="categories-row">
+                <select class="custom-filter-select" name="MainCategory" id="mainCategorySelect" required>
+                    <option value="" disabled selected>Rodzaj dania</option>
+                    <option value="śniadania">śniadania</option>
+                    <option value="obiady">obiady</option>
+                    <option value="desery">desery</option>
+                </select>
+
+                <select class="custom-filter-select" name="SubCategory" id="subCategorySelect" disabled required>
+                    <option value="" disabled selected>Podkategoria</option>
+                </select>
+
+                <select class="custom-filter-select" name="DietType" required>
+                    <option value="" disabled selected>Typ diety</option>
+                    <option value="wege">wege</option>
+                    <option value="vegan">vegan</option>
+                    <option value="proteinowa">proteinowa</option>
+                    <option value="keto">keto</option>
+                </select>
+
+                <select class="custom-filter-select" name="CuisineType" required>
+                    <option value="" disabled selected>Kuchnia</option>
+                    <option value="polska">polska</option>
+                    <option value="włoska">włoska</option>
+                    <option value="grecka">grecka</option>
+                    <option value="azjatycka">azjatycka</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="submit-section">
+            <button type="submit" class="submit-recipe-btn">dodaj przepis</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/recipe-add.js" asp-append-version="true"></script>
+}

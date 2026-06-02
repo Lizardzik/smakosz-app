@@ -19,12 +19,14 @@ namespace SmakoszApp.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
+        // Wyświetlanie formularza logowania i rejestracji
         [HttpGet]
         public IActionResult Index()
         {
             return View(new AccountViewModel());
         }
 
+        // Logika rejestracji nowego użytkownika
         [HttpPost]
         public async Task<IActionResult> Register(AccountViewModel model)
         {
@@ -49,6 +51,7 @@ namespace SmakoszApp.Controllers
             return RedirectToAction("Index");
         }
 
+        // Logika logowania użytkownika
         [HttpPost]
         public async Task<IActionResult> Login(AccountViewModel model)
         {
@@ -74,9 +77,22 @@ namespace SmakoszApp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        // Wylogowanie użytkownika
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction("Index", "Account");
+        }
+
+        // Logowanie jako gość
+        public async Task<IActionResult> Guest()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+
             return RedirectToAction("Index", "Home");
         }
     }
