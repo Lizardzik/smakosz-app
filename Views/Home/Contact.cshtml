@@ -6,6 +6,30 @@
     <link rel="stylesheet" href="~/css/contact.css" asp-append-version="true" />
 }
 
-@*
-    Tutaj kod dla strony kontaktowej. style juz sa puste ale nazwa to contact.css
-*@
+<div class="smakosz-contact-wrapper">
+    <div class="contact-header-text">
+        <h2>Masz pytania?</h2>
+        <p class="subtitle-1">Napisz do nas</p>
+        <p class="contact-email-highlight">przepisy@@smakosz.pl</p>
+        <p class="subtitle-2">lub skontaktuj sie z nami za pomocą formulrza kontaktowego</p>
+    </div>
+
+    <div class="contact-card-box">
+        <form onsubmit="return false;">
+
+            <div class="form-row-inline">
+                <input type="text" class="contact-round-input" placeholder="imię" />
+                <input type="email" class="contact-round-input" placeholder="e-mail" />
+            </div>
+
+            <div class="form-row-full">
+                <textarea class="contact-round-textarea" placeholder="wiadomość"></textarea>
+            </div>
+
+            <div class="form-button-center">
+                <button type="button" class="contact-pill-btn">wyślij</button>
+            </div>
+
+        </form>
+    </div>
+</div>

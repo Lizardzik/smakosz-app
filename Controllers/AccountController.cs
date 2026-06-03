@@ -44,6 +44,8 @@ namespace SmakoszApp.Controllers
 
             user.Password = _passwordHasher.HashPassword(user, model.Password);
 
+            _context.Users.Add(user);
+
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Konto zostało pomyślnie utworzone. Możesz się teraz zalogować.";

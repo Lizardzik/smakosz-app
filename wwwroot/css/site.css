@@ -106,3 +106,61 @@ h1, h2, h3, h4, h5, h6, .logo-font {
     cursor: pointer;
     line-height: 1;
 }
+
+
+.smakosz-simple-footer {
+    position: relative !important; 
+    background-color: #4F6D7A !important;
+    padding: 0 40px !important; 
+    height: 70px !important; 
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-family: 'Montserrat', sans-serif !important;
+    color: #2D3142 !important;
+    font-size: 0.95rem !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+}
+
+
+.footer-left {
+    display: flex !important;
+    gap: 30px !important;
+    z-index: 1 !important;
+}
+
+    .footer-left span {
+        font-weight: 500 !important;
+        letter-spacing: 0.5px !important;
+    }
+
+
+.footer-center {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important; 
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.footer-logo-img {
+    height: 120px !important; 
+    width: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    
+    transform: scale(1.4) !important;
+}
+
+.footer-right {
+    z-index: 1 !important;
+}
+
+    .footer-right span {
+        font-weight: 500 !important;
+    }
