@@ -9,6 +9,17 @@
 }
 
 <div class="add-recipe-container">
+
+    <div class="add-recipe-container">
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-alert">
+            <span>@TempData["ErrorMessage"]</span>
+            <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    }
+
     <form class="add-recipe-form" method="post" action="/Recipe/Edit/@Model.Id" enctype="multipart/form-data">
 
         <div class="recipe-grid">

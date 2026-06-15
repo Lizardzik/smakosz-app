@@ -1,33 +1,43 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-light);
+    font-family: 'Montserrat', sans-serif;
+    color: var(--color-dark);
+}
+main[role="main"] {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
@@ -40,18 +50,13 @@ body {
     --color-dark: #2D3142;
 }
 
-body {
-    background-color: var(--color-bg-light);
-    font-family: 'Montserrat', sans-serif;
-    color: var(--color-dark);
-}
-
 h1, h2, h3, h4, h5, h6, .logo-font {
     font-family: 'Playfair Display', serif;
 }
 
 .smakosz-main-content, .gallery-container, .my-recipes-wrapper, .add-recipe-container, .recipe-details-container {
     max-width: 1100px;
+    width: 100%;
     margin: 40px auto;
     padding: 20px;
 }
@@ -62,6 +67,7 @@ h1, h2, h3, h4, h5, h6, .logo-font {
     gap: 30px;
     justify-items: center;
 }
+
 .dish-item-card, .recipe-card, .gallery-item {
     width: 100%;
     max-width: 260px;
@@ -73,7 +79,6 @@ h1, h2, h3, h4, h5, h6, .logo-font {
     background-color: white;
 }
 
-
     .recipe-card img, .gallery-item img {
         width: 100%;
         aspect-ratio: 1 / 1;
@@ -84,6 +89,18 @@ h1, h2, h3, h4, h5, h6, .logo-font {
 .success-alert {
     background-color: #d4ebd0;
     color: var(--color-dark);
+    padding: 15px 40px 15px 15px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border: 2px solid var(--color-dark);
+    position: relative;
+}
+
+.error-alert {
+    background-color: #f8d7da;
+    color: #721c24;
     padding: 15px 40px 15px 15px;
     border-radius: 15px;
     text-align: center;
@@ -106,61 +123,68 @@ h1, h2, h3, h4, h5, h6, .logo-font {
     cursor: pointer;
     line-height: 1;
 }
-
-
 .smakosz-simple-footer {
-    position: relative !important; 
-    background-color: #4F6D7A !important;
-    padding: 0 40px !important; 
-    height: 70px !important; 
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    font-family: 'Montserrat', sans-serif !important;
-    color: #2D3142 !important;
-    font-size: 0.95rem !important;
-    margin-top: auto !important;
-    width: 100% !important;
-    flex-shrink: 0 !important;
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    flex-shrink: 0;
 }
 
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 .footer-left {
-    display: flex !important;
-    gap: 30px !important;
-    z-index: 1 !important;
+    display: flex;
+    gap: 20px;
 }
 
-    .footer-left span {
-        font-weight: 500 !important;
-        letter-spacing: 0.5px !important;
+.footer-link {
+    color: var(--color-dark) !important;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: opacity 0.2s ease;
+}
+
+    .footer-link:hover {
+        opacity: 0.7;
+        color: var(--color-dark) !important;
     }
 
-
 .footer-center {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important; 
-    height: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
 }
 
-.footer-logo-img {
-    height: 120px !important; 
-    width: auto !important;
-    object-fit: contain !important;
-    display: block !important;
-    
-    transform: scale(1.4) !important;
+.footer-brand {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.footer-subtitle {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
 }
 
 .footer-right {
-    z-index: 1 !important;
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
-    .footer-right span {
-        font-weight: 500 !important;
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
     }
+}

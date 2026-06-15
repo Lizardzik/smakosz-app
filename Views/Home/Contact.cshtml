@@ -7,27 +7,44 @@
 }
 
 <div class="smakosz-contact-wrapper">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="success-alert" style="max-width: 400px; margin: 0 auto 30px auto;">
+            <span>@TempData["SuccessMessage"]</span>
+            <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="error-alert" style="max-width: 400px; margin: 0 auto 30px auto;">
+            <span>@TempData["ErrorMessage"]</span>
+            <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    }
+
     <div class="contact-header-text">
         <h2>Masz pytania?</h2>
         <p class="subtitle-1">Napisz do nas</p>
-        <p class="contact-email-highlight">przepisy@@smakosz.pl</p>
-        <p class="subtitle-2">lub skontaktuj sie z nami za pomocą formulrza kontaktowego</p>
+        <p class="contact-email-highlight">przepisy.smakosz@@gmail.com</p>
+        <p class="subtitle-2">lub skontaktuj się z nami za pomocą formularza kontaktowego</p>
     </div>
 
     <div class="contact-card-box">
-        <form onsubmit="return false;">
+        <form method="post" action="/Home/SendContactEmail">
 
             <div class="form-row-inline">
-                <input type="text" class="contact-round-input" placeholder="imię" />
-                <input type="email" class="contact-round-input" placeholder="e-mail" />
+                <input type="text" name="SenderName" class="contact-round-input" placeholder="imię" required />
+                <input type="email" name="SenderEmail" class="contact-round-input" placeholder="e-mail" required />
             </div>
 
             <div class="form-row-full">
-                <textarea class="contact-round-textarea" placeholder="wiadomość"></textarea>
+                <textarea name="Message" class="contact-round-textarea" placeholder="wiadomość" required></textarea>
             </div>
 
             <div class="form-button-center">
-                <button type="button" class="contact-pill-btn">wyślij</button>
+                <button type="submit" class="contact-pill-btn">wyślij</button>
             </div>
 
         </form>

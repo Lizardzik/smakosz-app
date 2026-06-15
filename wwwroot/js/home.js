@@ -36,7 +36,14 @@ document.querySelectorAll('.radio-label input').forEach(input => {
 });
 
 // Inicjalizacja nasłuchiwania dla wyszukiwarki
-searchInput.addEventListener('input', updateFilters);
+let searchTimeout;
+
+searchInput.addEventListener('input', function () {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function () {
+        updateFilters();
+    }, 400);
+});
 
 // Czyszczenie wszystkich aktywnych filtrów i pola wyszukiwania
 resetBtn.addEventListener('click', function () {

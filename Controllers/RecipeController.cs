@@ -35,33 +35,58 @@ namespace SmakoszApp.Controllers
 
             model.UserId = int.Parse(userIdString);
 
-            if (ImageFile != null && ImageFile.Length > 0)
+            var validIngredients = IngredientsList.Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
+
+            foreach (var item in validIngredients)
             {
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/recipes");
-
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                var filePath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-
-                model.ImagePath = "/images/recipes/" + fileName;
+                model.Ingredients.Add(new Ingredient { Name = item });
             }
 
-            foreach (var item in IngredientsList)
+            var lastRecipe = await _context.Recipes
+                .Where(r => r.UserId == model.UserId)
+                .OrderByDescending(r => r.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (lastRecipe != null && (DateTime.Now - lastRecipe.CreatedAt).TotalHours < 1)
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                {
-                    model.Ingredients.Add(new Ingredient { Name = item });
-                }
+                TempData["ErrorMessage"] = "Możesz dodać tylko jeden przepis na godzinę. Spróbuj ponownie później.";
+                return View(model);
             }
+
+            if (validIngredients.Count < 3)
+            {
+                TempData["ErrorMessage"] = "Przepis musi zawierać przynajmniej trzy składniki.";
+                return View(model);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Instructions) || model.Instructions.Length < 40)
+            {
+                TempData["ErrorMessage"] = "Opis przygotowania jest zbyt krótki. Rozwiń go bardziej.";
+                return View(model);
+            }
+
+            if (ImageFile == null || ImageFile.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Każdy przepis musi posiadać zdjęcie.";
+                return View(model);
+            }
+
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/recipes");
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await ImageFile.CopyToAsync(stream);
+            }
+
+            model.ImagePath = "/images/recipes/" + fileName;
 
             _context.Recipes.Add(model);
             await _context.SaveChangesAsync();
@@ -155,6 +180,36 @@ namespace SmakoszApp.Controllers
 
             if (recipe == null) return NotFound();
 
+            var validIngredients = IngredientsList.Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
+
+            bool hasError = false;
+            if (validIngredients.Count < 3)
+            {
+                TempData["ErrorMessage"] = "Przepis musi zawierać przynajmniej trzy składniki.";
+                hasError = true;
+            }
+            else if (string.IsNullOrWhiteSpace(updatedRecipe.Instructions) || updatedRecipe.Instructions.Length < 40)
+            {
+                TempData["ErrorMessage"] = "Opis przygotowania jest zbyt krótki. Rozwiń go bardziej.";
+                hasError = true;
+            }
+
+            if (hasError)
+            {
+                recipe.Title = updatedRecipe.Title;
+                recipe.Instructions = updatedRecipe.Instructions;
+                recipe.PrepTimeMinutes = updatedRecipe.PrepTimeMinutes;
+                recipe.Calories = updatedRecipe.Calories;
+                recipe.MainCategory = updatedRecipe.MainCategory;
+                recipe.SubCategory = updatedRecipe.SubCategory;
+                recipe.DietType = updatedRecipe.DietType;
+                recipe.CuisineType = updatedRecipe.CuisineType;
+
+                recipe.Ingredients = validIngredients.Select(i => new Ingredient { Name = i }).ToList();
+
+                return View(recipe);
+            }
+
             recipe.Title = updatedRecipe.Title;
             recipe.Instructions = updatedRecipe.Instructions;
             recipe.PrepTimeMinutes = updatedRecipe.PrepTimeMinutes;
@@ -187,12 +242,9 @@ namespace SmakoszApp.Controllers
             }
 
             _context.Ingredients.RemoveRange(recipe.Ingredients);
-            foreach (var item in IngredientsList)
+            foreach (var item in validIngredients)
             {
-                if (!string.IsNullOrWhiteSpace(item))
-                {
-                    recipe.Ingredients.Add(new Ingredient { Name = item });
-                }
+                recipe.Ingredients.Add(new Ingredient { Name = item });
             }
 
             await _context.SaveChangesAsync();
