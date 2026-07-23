@@ -1,22 +1,36 @@
-﻿// Przełączanie widoczności formularzy logowania i rejestracji
-function toggleForms() {
-    var login = document.getElementById('loginForm');
-    var register = document.getElementById('registerForm');
+﻿function showForm(formType) {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
 
-    if (login.classList.contains('d-none')) {
-        login.classList.remove('d-none');
-        register.classList.add('d-none');
+    if (formType === 'register') {
+        if (loginForm) loginForm.classList.add('d-none');
+        if (registerForm) registerForm.classList.remove('d-none');
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (tabRegister) tabRegister.classList.add('active');
     } else {
-        login.classList.add('d-none');
-        register.classList.remove('d-none');
+        if (registerForm) registerForm.classList.add('d-none');
+        if (loginForm) loginForm.classList.remove('d-none');
+        if (tabRegister) tabRegister.classList.remove('active');
+        if (tabLogin) tabLogin.classList.add('active');
     }
 }
 
-// Sprawdzanie parametru w URL i wymuszanie widoku rejestracji
-document.addEventListener("DOMContentLoaded", function () {
+// Zastępuje starą funkcję toggleForms dla wstecznej kompatybilności
+function toggleForms() {
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm && registerForm.classList.contains('d-none')) {
+        showForm('register');
+    } else {
+        showForm('login');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Automatyczne otwarcie rejestracji po wejściu z linku "/Account/Index?show=register"
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('show') === 'register') {
-        document.getElementById('loginForm').classList.add('d-none');
-        document.getElementById('registerForm').classList.remove('d-none');
+        showForm('register');
     }
 });

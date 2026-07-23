@@ -11,6 +11,8 @@ namespace SmakoszApp.Data
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         //wyłaczenie kaskadowego usuwania dla relacji Favorites -> User, aby uniknąć problemów z migracjami w SQL Server
         protected override void OnModelCreating(ModelBuilder modelBuilder)

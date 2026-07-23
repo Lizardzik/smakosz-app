@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 500 190" width="500" height="190">
+  <!-- Główna nazwa smakosz -->
+  <text x="50%" y="145" 
+        text-anchor="middle" 
+        font-family="'Playfair Display', 'Georgia', serif" 
+        font-weight="900" 
+        font-size="82" 
+        fill="#2D3142" 
+        letter-spacing="-1.5">smakosz</text>
+  
+  <!-- Angielski podtytuł RECIPE HUB -->
+  <text x="50%" y="195" 
+        text-anchor="middle" 
+        font-family="'Montserrat', 'Arial', sans-serif" 
+        font-weight="600" 
+        font-size="24" 
+        fill="#2D3142" 
+        letter-spacing="5">RECIPE HUB</text>
+</svg>

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmakoszApp.Data;
 using SmakoszApp.Models;
+using SmakoszApp.Services;
 using System.Security.Claims;
 
 namespace SmakoszApp.Controllers
@@ -9,253 +10,16 @@ namespace SmakoszApp.Controllers
     public class RecipeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly MealApiService _mealApiService;
 
-        public RecipeController(ApplicationDbContext context)
+        public RecipeController(ApplicationDbContext context, MealApiService mealApiService)
         {
             _context = context;
+            _mealApiService = mealApiService;
         }
 
-        // Wyświetlanie formularza dodawania przepisu
-        [HttpGet]
-        public IActionResult Add()
-        {
-            return View();
-        }
-
-        // Zapisywanie nowego przepisu i zdjęcia w bazie
         [HttpPost]
-        public async Task<IActionResult> Add(Recipe model, List<string> IngredientsList, IFormFile ImageFile)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return RedirectToAction("Index", "Account");
-            }
-
-            model.UserId = int.Parse(userIdString);
-
-            var validIngredients = IngredientsList.Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
-
-            foreach (var item in validIngredients)
-            {
-                model.Ingredients.Add(new Ingredient { Name = item });
-            }
-
-            var lastRecipe = await _context.Recipes
-                .Where(r => r.UserId == model.UserId)
-                .OrderByDescending(r => r.CreatedAt)
-                .FirstOrDefaultAsync();
-
-            if (lastRecipe != null && (DateTime.Now - lastRecipe.CreatedAt).TotalHours < 1)
-            {
-                TempData["ErrorMessage"] = "Możesz dodać tylko jeden przepis na godzinę. Spróbuj ponownie później.";
-                return View(model);
-            }
-
-            if (validIngredients.Count < 3)
-            {
-                TempData["ErrorMessage"] = "Przepis musi zawierać przynajmniej trzy składniki.";
-                return View(model);
-            }
-
-            if (string.IsNullOrWhiteSpace(model.Instructions) || model.Instructions.Length < 40)
-            {
-                TempData["ErrorMessage"] = "Opis przygotowania jest zbyt krótki. Rozwiń go bardziej.";
-                return View(model);
-            }
-
-            if (ImageFile == null || ImageFile.Length == 0)
-            {
-                TempData["ErrorMessage"] = "Każdy przepis musi posiadać zdjęcie.";
-                return View(model);
-            }
-
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/recipes");
-
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-            var filePath = Path.Combine(folderPath, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await ImageFile.CopyToAsync(stream);
-            }
-
-            model.ImagePath = "/images/recipes/" + fileName;
-
-            _context.Recipes.Add(model);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Przepis został dodany pomyślnie!";
-            return RedirectToAction("Index", "Home");
-        }
-
-        // Wyświetlanie listy przepisów przypisanych do konta
-        [HttpGet]
-        public async Task<IActionResult> MyRecipes()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return RedirectToAction("Index", "Account");
-            }
-
-            int userId = int.Parse(userIdString);
-
-            var recipes = await _context.Recipes
-                .Where(r => r.UserId == userId)
-                .ToListAsync();
-
-            return View(recipes);
-        }
-
-        // Usuwanie przepisu oraz przypisanego zdjęcia z serwera
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Index", "Account");
-
-            int userId = int.Parse(userIdString);
-
-            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
-
-            if (recipe == null)
-            {
-                return NotFound();
-            }
-
-            if (!string.IsNullOrEmpty(recipe.ImagePath))
-            {
-                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", recipe.ImagePath.TrimStart('/'));
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
-            }
-
-            _context.Recipes.Remove(recipe);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Przepis został usunięty.";
-            return RedirectToAction("MyRecipes");
-        }
-
-        // Pobieranie danych przepisu do formularza edycji
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Index", "Account");
-
-            int userId = int.Parse(userIdString);
-
-            var recipe = await _context.Recipes
-                .Include(r => r.Ingredients)
-                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
-
-            if (recipe == null) return NotFound();
-
-            return View(recipe);
-        }
-
-        // Zapisywanie wprowadzonych zmian i ewentualna podmiana zdjęcia
-        [HttpPost]
-        public async Task<IActionResult> Edit(int id, Recipe updatedRecipe, List<string> IngredientsList, IFormFile? ImageFile)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Index", "Account");
-
-            int userId = int.Parse(userIdString);
-
-            var recipe = await _context.Recipes
-                .Include(r => r.Ingredients)
-                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
-
-            if (recipe == null) return NotFound();
-
-            var validIngredients = IngredientsList.Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
-
-            bool hasError = false;
-            if (validIngredients.Count < 3)
-            {
-                TempData["ErrorMessage"] = "Przepis musi zawierać przynajmniej trzy składniki.";
-                hasError = true;
-            }
-            else if (string.IsNullOrWhiteSpace(updatedRecipe.Instructions) || updatedRecipe.Instructions.Length < 40)
-            {
-                TempData["ErrorMessage"] = "Opis przygotowania jest zbyt krótki. Rozwiń go bardziej.";
-                hasError = true;
-            }
-
-            if (hasError)
-            {
-                recipe.Title = updatedRecipe.Title;
-                recipe.Instructions = updatedRecipe.Instructions;
-                recipe.PrepTimeMinutes = updatedRecipe.PrepTimeMinutes;
-                recipe.Calories = updatedRecipe.Calories;
-                recipe.MainCategory = updatedRecipe.MainCategory;
-                recipe.SubCategory = updatedRecipe.SubCategory;
-                recipe.DietType = updatedRecipe.DietType;
-                recipe.CuisineType = updatedRecipe.CuisineType;
-
-                recipe.Ingredients = validIngredients.Select(i => new Ingredient { Name = i }).ToList();
-
-                return View(recipe);
-            }
-
-            recipe.Title = updatedRecipe.Title;
-            recipe.Instructions = updatedRecipe.Instructions;
-            recipe.PrepTimeMinutes = updatedRecipe.PrepTimeMinutes;
-            recipe.Calories = updatedRecipe.Calories;
-            recipe.MainCategory = updatedRecipe.MainCategory;
-            recipe.SubCategory = updatedRecipe.SubCategory;
-            recipe.DietType = updatedRecipe.DietType;
-            recipe.CuisineType = updatedRecipe.CuisineType;
-
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                if (!string.IsNullOrEmpty(recipe.ImagePath))
-                {
-                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", recipe.ImagePath.TrimStart('/'));
-                    if (System.IO.File.Exists(oldImagePath)) System.IO.File.Delete(oldImagePath);
-                }
-
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/recipes");
-                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                var filePath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-
-                recipe.ImagePath = "/images/recipes/" + fileName;
-            }
-
-            _context.Ingredients.RemoveRange(recipe.Ingredients);
-            foreach (var item in validIngredients)
-            {
-                recipe.Ingredients.Add(new Ingredient { Name = item });
-            }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Przepis zaktualizowany pomyślnie.";
-            return RedirectToAction("Index", "Home");
-        }
-
-        // Dodawanie i usuwanie przepisu z listy ulubionych
-        [HttpPost]
-        public async Task<IActionResult> ToggleFavorite(int recipeId)
+        public async Task<IActionResult> ToggleFavorite(string recipeId, string title, string thumb, string category, string area)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
@@ -263,7 +27,7 @@ namespace SmakoszApp.Controllers
             int userId = int.Parse(userIdString);
 
             var favorite = await _context.Favorites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.RecipeId == recipeId);
+                .FirstOrDefaultAsync(f => f.UserId == userId && f.ExternalMealId == recipeId);
 
             bool isFavorite;
             if (favorite != null)
@@ -273,7 +37,15 @@ namespace SmakoszApp.Controllers
             }
             else
             {
-                _context.Favorites.Add(new Favorite { UserId = userId, RecipeId = recipeId });
+                _context.Favorites.Add(new Favorite
+                {
+                    UserId = userId,
+                    ExternalMealId = recipeId,
+                    MealName = title ?? "",
+                    MealThumb = thumb ?? "",
+                    Category = category ?? "",
+                    Area = area ?? ""
+                });
                 isFavorite = true;
             }
 
@@ -281,7 +53,6 @@ namespace SmakoszApp.Controllers
             return Json(new { isFavorite = isFavorite });
         }
 
-        // Wyświetlanie listy ulubionych potraw
         [HttpGet]
         public async Task<IActionResult> Favorites()
         {
@@ -290,28 +61,191 @@ namespace SmakoszApp.Controllers
 
             int userId = int.Parse(userIdString);
 
-            var favoriteRecipes = await _context.Favorites
+            var favoriteMeals = await _context.Favorites
                 .Where(f => f.UserId == userId)
-                .Select(f => f.Recipe)
+                .OrderByDescending(f => f.AddedAt)
                 .ToListAsync();
 
-            return View(favoriteRecipes);
+            return View(favoriteMeals);
         }
 
-        // Wyświetlanie szczegółów wybranej potrawy
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string id)
         {
-            var recipe = await _context.Recipes
-                .Include(r => r.Ingredients)
-                .FirstOrDefaultAsync(r => r.Id == id);
+            if (string.IsNullOrEmpty(id)) return NotFound();
 
-            if (recipe == null)
+            var meal = await _mealApiService.GetMealByIdAsync(id);
+            if (meal == null) return NotFound();
+
+            var ratings = await _context.Ratings
+                .Where(r => r.ExternalMealId == id)
+                .ToListAsync();
+
+            var comments = await _context.Comments
+                .Include(c => c.User)
+                .Where(c => c.ExternalMealId == id)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.Comments = comments;
+
+            int totalVotes = ratings.Count;
+            double avgScore = totalVotes > 0 ? Math.Round(ratings.Average(r => r.Score), 1) : 0.0;
+
+            var starBreakdown = new Dictionary<int, int>
             {
-                return NotFound();
+                { 5, ratings.Count(r => r.Score == 5) },
+                { 4, ratings.Count(r => r.Score == 4) },
+                { 3, ratings.Count(r => r.Score == 3) },
+                { 2, ratings.Count(r => r.Score == 2) },
+                { 1, ratings.Count(r => r.Score == 1) }
+            };
+
+            bool isFavorite = false;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int userId))
+                {
+                    isFavorite = await _context.Favorites.AnyAsync(f => f.UserId == userId && f.ExternalMealId == id);
+                }
             }
 
-            return View(recipe);
+            ViewBag.AverageScore = avgScore;
+            ViewBag.TotalVotes = totalVotes;
+            ViewBag.StarBreakdown = starBreakdown;
+            ViewBag.IsFavorite = isFavorite;
+
+            return View(meal);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RateRecipe(string recipeId, int score)
+        {
+            if (score < 1 || score > 5) return BadRequest("Score must be between 1 and 5.");
+
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = !string.IsNullOrEmpty(userIdString) ? int.Parse(userIdString) : null;
+            string userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0.0.0.0";
+
+            Rating? existingRating = null;
+
+            if (userId.HasValue)
+            {
+                existingRating = await _context.Ratings
+                    .FirstOrDefaultAsync(r => r.ExternalMealId == recipeId && r.UserId == userId.Value);
+            }
+            else
+            {
+                existingRating = await _context.Ratings
+                    .FirstOrDefaultAsync(r => r.ExternalMealId == recipeId && r.UserId == null && r.UserIp == userIp);
+            }
+
+            bool isNewRating = (existingRating == null);
+
+            if (existingRating != null)
+            {
+                existingRating.Score = score;
+                existingRating.CreatedAt = DateTime.Now;
+            }
+            else
+            {
+                _context.Ratings.Add(new Rating
+                {
+                    ExternalMealId = recipeId,
+                    Score = score,
+                    UserId = userId,
+                    UserIp = userIp
+                });
+            }
+
+            if (userId.HasValue && isNewRating)
+            {
+                var user = await _context.Users.FindAsync(userId.Value);
+                if (user != null)
+                {
+                    user.ReputationPoints += 1;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            var ratingsForMeal = await _context.Ratings
+                .Where(r => r.ExternalMealId == recipeId)
+                .ToListAsync();
+
+            double avgScore = ratingsForMeal.Average(r => r.Score);
+            int votesCount = ratingsForMeal.Count;
+
+            return Json(new
+            {
+                success = true,
+                average = Math.Round(avgScore, 1),
+                votes = votesCount,
+                userScore = score
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(string recipeId, string text)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(text) || text.Length < 3)
+            {
+                return BadRequest("Comment is too short.");
+            }
+
+            int userId = int.Parse(userIdString);
+
+            var comment = new Comment
+            {
+                ExternalMealId = recipeId,
+                UserId = userId,
+                Text = text.Trim(),
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Comments.Add(comment);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.ReputationPoints += 10;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                author = user?.Login ?? "User",
+                text = comment.Text,
+                date = comment.CreatedAt.ToString("MMM dd, yyyy HH:mm"),
+                commentId = comment.Id
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LikeComment(int commentId)
+        {
+            var comment = await _context.Comments
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == commentId);
+
+            if (comment == null) return NotFound();
+
+            comment.LikesCount++;
+
+            if (comment.User != null)
+            {
+                comment.User.ReputationPoints += 5;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, likes = comment.LikesCount });
         }
     }
 }

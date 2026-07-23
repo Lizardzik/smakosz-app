@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Kontakt";
+    ViewData["Title"] = "Contact";
 }
 
 @section Styles {
@@ -10,7 +10,7 @@
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="success-alert" style="max-width: 400px; margin: 0 auto 30px auto;">
+        <div class="success-alert">
             <span>@TempData["SuccessMessage"]</span>
             <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
         </div>
@@ -18,33 +18,33 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="error-alert" style="max-width: 400px; margin: 0 auto 30px auto;">
+        <div class="error-alert">
             <span>@TempData["ErrorMessage"]</span>
             <button type="button" class="close-alert-btn" onclick="this.parentElement.style.display='none'">&times;</button>
         </div>
     }
 
     <div class="contact-header-text">
-        <h2>Masz pytania?</h2>
-        <p class="subtitle-1">Napisz do nas</p>
-        <p class="contact-email-highlight">przepisy.smakosz@@gmail.com</p>
-        <p class="subtitle-2">lub skontaktuj się z nami za pomocą formularza kontaktowego</p>
+        <h2>Have Any Questions?</h2>
+        <p class="subtitle-1">Get in touch with us</p>
+        <p class="contact-email-highlight">smakoszsite@@gmail.com</p>
+        <p class="subtitle-2">or send us a message directly using the form below</p>
     </div>
 
     <div class="contact-card-box">
         <form method="post" action="/Home/SendContactEmail">
 
             <div class="form-row-inline">
-                <input type="text" name="SenderName" class="contact-round-input" placeholder="imię" required />
-                <input type="email" name="SenderEmail" class="contact-round-input" placeholder="e-mail" required />
+                <input type="text" name="SenderName" class="contact-round-input" placeholder="Your Name" required />
+                <input type="email" name="SenderEmail" class="contact-round-input" placeholder="Your E-mail" required />
             </div>
 
             <div class="form-row-full">
-                <textarea name="Message" class="contact-round-textarea" placeholder="wiadomość" required></textarea>
+                <textarea name="Message" class="contact-round-textarea" placeholder="Your Message..." required></textarea>
             </div>
 
             <div class="form-button-center">
-                <button type="submit" class="contact-pill-btn">wyślij</button>
+                <button type="submit" class="contact-pill-btn">Send Message</button>
             </div>
 
         </form>

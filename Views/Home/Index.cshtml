@@ -1,14 +1,17 @@
-﻿@model IEnumerable<SmakoszApp.Models.Recipe>
+﻿@model List<SmakoszApp.Models.ExternalMeal>
 
 @{
-    ViewData["Title"] = "Strona Główna";
+    ViewData["Title"] = "Home Page";
+    string selectedCat = ViewBag.SelectedCategory ?? "";
+    string selectedCuis = ViewBag.SelectedCuisine ?? "";
+    string searchQ = ViewBag.SearchQuery ?? "";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 }
 
-<div class="smakosz-main-content">
+<div class="smakosz-main-container">
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -18,114 +21,64 @@
         </div>
     }
 
-    <div class="search-box-container">
-        <input type="text" class="search-box-input" id="searchInput" placeholder="znajdź swój przepis" />
-    </div>
+    <!-- Search box -->
+    <form method="get" asp-action="Index" id="filterForm">
+        <input type="hidden" name="category" id="hiddenCategory" value="@selectedCat" />
+        <input type="hidden" name="cuisine" id="hiddenCuisine" value="@selectedCuis" />
+        <input type="hidden" name="page" id="hiddenPage" value="@(ViewBag.CurrentPage ?? 1)" />
 
-    <div class="divider-line">filtry</div>
+        <div class="search-box-container">
+            <input type="text"
+                   name="search"
+                   class="search-box-input"
+                   id="searchInput"
+                   value="@searchQ"
+                   placeholder="Find your recipe (e.g., Chicken, Pasta, Beef)..." />
+        </div>
+    </form>
 
+    <div class="divider-line">filters</div>
+
+    <!-- Filter Dropdowns -->
     <div class="filters-flex-box">
         <div class="custom-dropdown">
-            <button class="custom-filter-btn" type="button">Rodzaj dania</button>
+            <button class="custom-filter-btn" type="button" id="catBtn">
+                @(string.IsNullOrEmpty(selectedCat) ? "Category" : char.ToUpper(selectedCat[0]) + selectedCat.Substring(1))
+            </button>
             <div class="custom-dropdown-content">
-                <label class="radio-label"><input type="radio" name="MainCategory" value="śniadania"><span class="radio-circle"></span> śniadania</label>
-                <label class="radio-label"><input type="radio" name="MainCategory" value="obiady"><span class="radio-circle"></span> obiady</label>
-                <label class="radio-label"><input type="radio" name="MainCategory" value="desery"><span class="radio-circle"></span> desery</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="chicken" @(selectedCat == "chicken" ? "checked" : "")><span class="radio-circle"></span> Chicken</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="beef" @(selectedCat == "beef" ? "checked" : "")><span class="radio-circle"></span> Beef</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="pasta" @(selectedCat == "pasta" ? "checked" : "")><span class="radio-circle"></span> Pasta</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="seafood" @(selectedCat == "seafood" ? "checked" : "")><span class="radio-circle"></span> Seafood</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="vegetarian" @(selectedCat == "vegetarian" ? "checked" : "")><span class="radio-circle"></span> Vegetarian</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="vegan" @(selectedCat == "vegan" ? "checked" : "")><span class="radio-circle"></span> Vegan</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="dessert" @(selectedCat == "dessert" ? "checked" : "")><span class="radio-circle"></span> Dessert</label>
+                <label class="radio-label"><input type="radio" name="MainCategory" value="starter" @(selectedCat == "starter" ? "checked" : "")><span class="radio-circle"></span> Starter</label>
             </div>
         </div>
 
         <div class="custom-dropdown">
-            <button class="custom-filter-btn" type="button">Podkategoria</button>
+            <button class="custom-filter-btn" type="button" id="cuisBtn">
+                @(string.IsNullOrEmpty(selectedCuis) ? "Cuisine" : char.ToUpper(selectedCuis[0]) + selectedCuis.Substring(1))
+            </button>
             <div class="custom-dropdown-content">
-                <label class="radio-label"><input type="radio" name="SubCategory" value="na słodko"><span class="radio-circle"></span> na słodko</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="na słono"><span class="radio-circle"></span> na słono</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="zupy"><span class="radio-circle"></span> zupy</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="makarony"><span class="radio-circle"></span> makarony</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="steki"><span class="radio-circle"></span> steki</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="sałatki"><span class="radio-circle"></span> sałatki</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="burgery"><span class="radio-circle"></span> burgery</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="ciasta"><span class="radio-circle"></span> ciasta</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="na zimno"><span class="radio-circle"></span> na zimno</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="puddingi"><span class="radio-circle"></span> puddingi</label>
-                <label class="radio-label"><input type="radio" name="SubCategory" value="mrożone"><span class="radio-circle"></span> mrożone</label>
-            </div>
-        </div>
-
-        <div class="custom-dropdown">
-            <button class="custom-filter-btn" type="button">Typ diety</button>
-            <div class="custom-dropdown-content">
-                <label class="radio-label"><input type="radio" name="DietType" value="wege"><span class="radio-circle"></span> wege</label>
-                <label class="radio-label"><input type="radio" name="DietType" value="vegan"><span class="radio-circle"></span> vegan</label>
-                <label class="radio-label"><input type="radio" name="DietType" value="proteinowa"><span class="radio-circle"></span> proteinowa</label>
-                <label class="radio-label"><input type="radio" name="DietType" value="keto"><span class="radio-circle"></span> keto</label>
-            </div>
-        </div>
-
-        <div class="custom-dropdown">
-            <button class="custom-filter-btn" type="button">Kuchnia</button>
-            <div class="custom-dropdown-content">
-                <label class="radio-label"><input type="radio" name="CuisineType" value="polska"><span class="radio-circle"></span> polska</label>
-                <label class="radio-label"><input type="radio" name="CuisineType" value="włoska"><span class="radio-circle"></span> włoska</label>
-                <label class="radio-label"><input type="radio" name="CuisineType" value="grecka"><span class="radio-circle"></span> grecka</label>
-                <label class="radio-label"><input type="radio" name="CuisineType" value="azjatycka"><span class="radio-circle"></span> azjatycka</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="italian" @(selectedCuis == "italian" ? "checked" : "")><span class="radio-circle"></span> Italian</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="polish" @(selectedCuis == "polish" ? "checked" : "")><span class="radio-circle"></span> Polish</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="american" @(selectedCuis == "american" ? "checked" : "")><span class="radio-circle"></span> American</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="japanese" @(selectedCuis == "japanese" ? "checked" : "")><span class="radio-circle"></span> Japanese</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="mexican" @(selectedCuis == "mexican" ? "checked" : "")><span class="radio-circle"></span> Mexican</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="chinese" @(selectedCuis == "chinese" ? "checked" : "")><span class="radio-circle"></span> Chinese</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="french" @(selectedCuis == "french" ? "checked" : "")><span class="radio-circle"></span> French</label>
+                <label class="radio-label"><input type="radio" name="CuisineType" value="greek" @(selectedCuis == "greek" ? "checked" : "")><span class="radio-circle"></span> Greek</label>
             </div>
         </div>
     </div>
 
-    <div class="main-layout">
-        <aside class="active-filters-panel">
-            <h3>Wybrane filtry</h3>
-            <div id="active-filters-list">
-                <p class="empty-filters-text">Brak aktywnych filtrów</p>
-            </div>
-            <button type="button" id="reset-filters-btn" class="reset-filters-btn" style="display: none;">Wyczyść filtry</button>
-        </aside>
-
-        <main class="dishes-grid" id="recipesGrid">
-            @if (!Model.Any())
-            {
-                <p>Brak przepisów w bazie. Dodaj swój pierwszy przepis!</p>
-            }
-            else
-            {
-                foreach (var recipe in Model)
-                {
-                    <div class="dish-item-card"
-                         data-main="@recipe.MainCategory"
-                         data-sub="@recipe.SubCategory"
-                         data-diet="@recipe.DietType"
-                         data-cuisine="@recipe.CuisineType"
-                         data-title="@recipe.Title.ToLower()">
-
-                        <a href="/Recipe/Details/@recipe.Id" style="display: block; color: inherit; text-decoration: none;">
-                            <div class="dish-image-wrapper">
-                                <img src="@recipe.ImagePath" alt="@recipe.Title" />
-                                <div class="dish-hover-overlay">
-                                    <span>🕒 @recipe.PrepTimeMinutes min</span>
-                                    <span>@recipe.Calories kcal</span>
-                                </div>
-                            </div>
-                        </a>
-
-                        <div class="dish-bottom-bar">
-                            <a href="/Recipe/Details/@recipe.Id" style="color: inherit; text-decoration: none; overflow: hidden;">
-                                <h4 class="dish-title" title="@recipe.Title">@recipe.Title</h4>
-                            </a>
-                            @if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                var favoriteIds = ViewBag.FavoriteIds as List<int> ?? new List<int>();
-                                var isFav = favoriteIds.Contains(recipe.Id);
-                                <button type="button" class="favorite-btn @(isFav ? "active" : "")" data-id="@recipe.Id">
-                                    @(isFav ? "♥" : "♡")
-                                </button>
-                            }
-                        </div>
-
-                    </div>
-                }
-            }
-        </main>
+    <!-- Dynamic Content Container -->
+    <div id="dynamicContentContainer">
+        @await Html.PartialAsync("_RecipesListPartial", Model)
     </div>
+
 </div>
 
 @section Scripts {

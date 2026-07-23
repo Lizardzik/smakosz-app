@@ -1,145 +1,103 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>@ViewData["Title"] - SmakoszApp</title>
-
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Smakosz</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/SmakoszApp.styles.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
-
 </head>
-
 <body>
 
     @if (ViewData["HideNav"] == null || !(bool)ViewData["HideNav"])
-
     {
-
         <header>
-
             <nav class="custom-navbar">
+                <div class="container-fluid navbar-container px-4">
 
-                <div class="container-fluid navbar-container px-3">
-
-
-
+                    <!-- Left Section -->
                     <div class="nav-left">
-
-                        <a href="/Home/Gallery" class="nav-link">galeria</a>
-
-                        <a href="/Home/Contact" class="nav-link">kontakt</a>
-
-                        @if (User.Identity.IsAuthenticated)
-
+                        <a class="nav-link" href="/Community/Leaderboard">Leaderboard</a>
+                        <a href="/Home/Contact" class="nav-link">Contact</a>
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-
-                            <a href="/Recipe/Favorites" class="nav-link">ulubione</a>
-
+                            <a href="/Recipe/Favorites" class="nav-link fw-semibold">Favorites</a>
                         }
-
                     </div>
 
-
-
+                    <!-- Center Brand (Logo Image) -->
                     <div class="nav-center">
-
-                        <a href="/Home/Index" class="navbar-brand-text">smakosz</a>
-
+                        <a href="/Home/Index" class="navbar-brand-logo">
+                            <img src="~/logo.svg" alt="smakosz recipe hub" />
+                        </a>
                     </div>
 
-
-
+                    <!-- Right Section -->
                     <div class="nav-right">
-
-                        @if (User.Identity.IsAuthenticated)
-
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-
-                            <a href="/Recipe/Add" class="nav-link">dodaj przepis</a>
-
-                            <a href="/Recipe/MyRecipes" class="nav-link">edytuj przepis</a>
-
-                            <div class="dropdown">
-
-                                <a href="#" class="nav-link fw-bold dropdown-toggle" id="userMenu" data-bs-toggle="dropdown">@User.Identity.Name</a>
-
-                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu">
-
-                                    <li><a class="dropdown-item" href="/Account/Logout">wyloguj</a></li>
-
+                            <div class="dropdown d-inline-block">
+                                <a href="#" class="nav-link fw-bold dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item custom-dropdown-item" href="/Recipe/Favorites">Favorites</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="/Recipe/Saved">Saved / Modified</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item custom-dropdown-item text-danger" href="/Account/Logout">Log Out</a></li>
                                 </ul>
-
                             </div>
-
                         }
-
                         else
-
                         {
-
-                            <a href="/Account/Index" class="nav-link">zaloguj się</a>
-
-                            <a href="/Account/Index?show=register" class="nav-link">zarejestruj się</a>
-
+                            <a href="/Account/Index" class="nav-link">Log In</a>
+                            <a href="/Account/Index?show=register" class="nav-link register-btn">Sign Up</a>
                         }
-
                     </div>
 
                 </div>
-
             </nav>
-
         </header>
-
     }
 
     <main role="main" class="pb-3">
-
         @RenderBody()
-
     </main>
 
     <footer class="smakosz-simple-footer">
         <div class="footer-container">
-            <div class="footer-left">
-                <a href="/Home/Gallery" class="footer-link">galeria</a>
-                <a href="/Home/Contact" class="footer-link">kontakt</a>
+            <!-- Footer Left: Essential Navigation -->
+            <div class="footer-section footer-left">
+                <span class="footer-heading">Navigation</span>
+                <a href="/Home/Index" class="footer-link">Home</a>
+                <a href="/Community/Leaderboard" class="footer-link">Leaderboard</a>
+                <a href="/Home/Contact" class="footer-link">Contact</a>
             </div>
 
-            <div class="footer-center">
-                <span class="footer-brand">smakosz</span>
-                <span class="footer-subtitle">serwis kulinarny</span>
+            <!-- Footer Center: Platform Tagline & Mission -->
+            <div class="footer-section footer-center">
+                <span class="footer-brand-title">smakosz</span>
+                <p class="footer-tagline">Discover, rate, and personalize your favorite recipes from around the globe.</p>
             </div>
 
-            <div class="footer-right">
-                <span>&copy; @DateTime.Now.Year Smakosz</span>
+            <!-- Footer Right: Copyright & Extra Info -->
+            <div class="footer-section footer-right">
+                <span class="footer-heading">Platform</span>
+                <span class="footer-info-text">Built for food enthusiasts</span>
+                <span class="footer-copy">&copy; @DateTime.Now.Year Smakosz. All rights reserved.</span>
             </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
-
 </html>

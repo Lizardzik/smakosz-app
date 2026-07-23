@@ -1,45 +1,91 @@
-﻿@model IEnumerable<SmakoszApp.Models.Recipe>
+﻿@model List<SmakoszApp.Models.Favorite>
 
 @{
-    ViewData["Title"] = "Ulubione Przepisy";
+    ViewData["Title"] = "My Favorites";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 }
 
-<div class="smakosz-main-content">
-    <div class="divider-line" style="margin-top:20px; margin-bottom: 40px;">Twoje ulubione przepisy</div>
+<div class="smakosz-main-container my-4">
+    <h2 class="text-center mb-4 logo-font" style="font-size: 2.2rem;">Your Favorite Recipes</h2>
 
-    <div style="max-width: 850px; margin: 0 auto;">
-        @if (!Model.Any())
-        {
-            <p style="text-align:center; opacity:0.7;">Nie dodałeś jeszcze żadnego przepisu do ulubionych.</p>
-        }
-        else
-        {
-            <div class="dishes-grid">
-                @foreach (var recipe in Model)
-                {
-                    <div class="dish-item-card">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center my-5">
+            <p class="lead">You haven't saved any recipes to your favorites yet.</p>
+            <a href="/Home/Index" class="btn btn-outline-dark rounded-pill px-4 mt-3" style="font-weight: 600;">&larr; Explore Recipes</a>
+        </div>
+    }
+    else
+    {
+        <div class="dishes-grid">
+            @foreach (var fav in Model)
+            {
+                <div class="dish-item-card">
+                    <a href="/Recipe/Details/@fav.ExternalMealId" style="display: block; color: inherit; text-decoration: none;">
                         <div class="dish-image-wrapper">
-                            <img src="@recipe.ImagePath" alt="@recipe.Title" />
+                            <img src="@fav.MealThumb" alt="@fav.MealName" loading="lazy" />
                             <div class="dish-hover-overlay">
-                                <span>🕒 @recipe.PrepTimeMinutes min</span>
-                                <span>🔥 @recipe.Calories kcal</span>
+                                <span>Category: @(string.IsNullOrEmpty(fav.Category) ? "N/A" : fav.Category)</span>
+                                <span>Cuisine: @(string.IsNullOrEmpty(fav.Area) ? "N/A" : fav.Area)</span>
                             </div>
                         </div>
+                    </a>
+
+                    <div class="dish-card-content">
                         <div class="dish-bottom-bar">
-                            <h4 class="dish-title" title="@recipe.Title">@recipe.Title</h4>
-                            <button type="button" class="favorite-btn active" data-id="@recipe.Id">♥</button>
+                            <a href="/Recipe/Details/@fav.ExternalMealId" style="color: inherit; text-decoration: none; overflow: hidden; flex: 1;">
+                                <h4 class="dish-title" title="@fav.MealName">@fav.MealName</h4>
+                            </a>
+                            <button type="button"
+                                    class="favorite-btn active"
+                                    data-id="@fav.ExternalMealId"
+                                    data-title="@fav.MealName"
+                                    data-thumb="@fav.MealThumb"
+                                    data-category="@fav.Category"
+                                    data-area="@fav.Area"
+                                    title="Remove from favorites">
+                                <svg class="heart-icon" viewBox="0 0 24 24" width="22" height="22">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
-                }
-            </div>
-        }
-    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @section Scripts {
-    <script src="~/js/favorites.js" asp-append-version="true"></script>
+    <script>
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const recipeId = this.dataset.id;
+                const card = this.closest('.dish-item-card');
+
+                try {
+                    const response = await fetch(`/Recipe/ToggleFavorite?recipeId=${recipeId}`, { method: 'POST' });
+                    if (response.ok) {
+                        if (card) {
+                            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.9)';
+                            setTimeout(() => {
+                                card.remove();
+                                if (document.querySelectorAll('.dish-item-card').length === 0) {
+                                    location.reload();
+                                }
+                            }, 300);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error removing favorite:", err);
+                }
+            });
+        });
+    </script>
 }

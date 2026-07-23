@@ -1,0 +1,81 @@
+﻿@model List<SmakoszApp.Models.User>
+
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/community.css" asp-append-version="true" />
+}
+
+<div class="smakosz-main-container my-4">
+
+    <div class="leaderboard-header text-center mb-5">
+        <h1 class="logo-font" style="font-size: 2.8rem;">Top Smakosze</h1>
+        <p class="leaderboard-subtitle">Earn points by rating recipes, commenting, and getting likes from the community!</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center my-5">
+            <p class="lead">No active users yet. Be the first to join and earn points!</p>
+        </div>
+    }
+    else
+    {
+        <div class="leaderboard-card">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 80px;">Rank</th>
+                        <th>User</th>
+                        <th class="text-end">Reputation Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int rank = 1;
+                    }
+                    @foreach (var user in Model)
+                    {
+                        string rankBadgeClass = rank switch
+                        {
+                            1 => "badge-gold",
+                            2 => "badge-silver",
+                            3 => "badge-bronze",
+                            _ => "badge-standard"
+                        };
+
+                        string rankIcon = rank switch
+                        {
+                            1 => "🥇",
+                            2 => "🥈",
+                            3 => "🥉",
+                            _ => $"#{rank}"
+                        };
+
+                        <tr class="@(User.Identity?.Name == user.Login ? "current-user-row" : "")">
+                            <td class="text-center">
+                                <span class="rank-badge @rankBadgeClass">@rankIcon</span>
+                            </td>
+                            <td>
+                                <div class="user-info-cell">
+                                    <span class="user-name">@user.Login</span>
+                                    @if (User.Identity?.Name == user.Login)
+                                    {
+                                        <span class="you-tag">(You)</span>
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-end fw-bold points-cell">
+                                @user.ReputationPoints <span class="pts-label">PTS</span>
+                            </td>
+                        </tr>
+                        rank++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

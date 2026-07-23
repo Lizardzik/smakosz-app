@@ -19,14 +19,14 @@ namespace SmakoszApp.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
-        // Wyświetlanie formularza logowania i rejestracji
+        // Wyświetlanie widoku logowania i rejestracji
         [HttpGet]
         public IActionResult Index()
         {
             return View(new AccountViewModel());
         }
 
-        // Logika rejestracji nowego użytkownika
+        // Obsługa rejestracji nowego użytkownika i haszowanie hasła
         [HttpPost]
         public async Task<IActionResult> Register(AccountViewModel model)
         {
@@ -39,13 +39,13 @@ namespace SmakoszApp.Controllers
             var user = new User
             {
                 Login = model.Login,
-                Email = model.Email
+                Email = model.Email,
+                ReputationPoints = 0
             };
 
             user.Password = _passwordHasher.HashPassword(user, model.Password);
 
             _context.Users.Add(user);
-
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Konto zostało pomyślnie utworzone. Możesz się teraz zalogować.";
@@ -53,7 +53,7 @@ namespace SmakoszApp.Controllers
             return RedirectToAction("Index");
         }
 
-        // Logika logowania użytkownika
+        // Obsługa weryfikacji danych i logowania użytkownika do sesji ciasteczek
         [HttpPost]
         public async Task<IActionResult> Login(AccountViewModel model)
         {
@@ -79,21 +79,21 @@ namespace SmakoszApp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // Wylogowanie użytkownika
+        // Wylogowanie zalogowanego użytkownika i powrót do ekranu logowania
         public async Task<IActionResult> Logout()
         {
+            HttpContext.Session.Clear();
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return RedirectToAction("Index", "Account");
         }
 
-        // Logowanie jako gość
+        // Wylogowanie ze wszystkich schematów, wyczyszczenie sesji i przekierowanie na stronę główną jako gość
         public async Task<IActionResult> Guest()
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
+            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
             return RedirectToAction("Index", "Home");
         }

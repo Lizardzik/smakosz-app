@@ -1,0 +1,176 @@
+﻿@model List<SmakoszApp.Models.ExternalMeal>
+
+@{
+    int totalItems = ViewBag.TotalItems ?? 0;
+    string selectedCat = ViewBag.SelectedCategory ?? "";
+    string selectedCuis = ViewBag.SelectedCuisine ?? "";
+    string searchQ = ViewBag.SearchQuery ?? "";
+    var favIds = ViewBag.UserFavoriteIds as List<string> ?? new List<string>();
+    var ratingsDict = ViewBag.RecipeRatings as Dictionary<string, SmakoszApp.Models.RecipeRatingDto>
+                      ?? new Dictionary<string, SmakoszApp.Models.RecipeRatingDto>();
+}
+
+<!-- Results counter -->
+<div class="results-info-bar" id="resultsCounter">
+    <span>Recipes found: <strong>@totalItems</strong></span>
+</div>
+
+<div class="main-layout">
+    <aside class="active-filters-panel">
+        <h3>Active Filters</h3>
+
+        <div id="active-filters-list">
+            @if (string.IsNullOrEmpty(selectedCat) && string.IsNullOrEmpty(selectedCuis) && string.IsNullOrEmpty(searchQ))
+            {
+                <p class="empty-filters-text">No active filters</p>
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(selectedCat))
+                {
+                    <span class="filter-tag">
+                        Category: @(char.ToUpper(selectedCat[0]) + selectedCat.Substring(1))
+                        <button type="button" class="remove-filter-btn" data-filter="category" title="Remove filter">&times;</button>
+                    </span>
+                }
+                if (!string.IsNullOrEmpty(selectedCuis))
+                {
+                    <span class="filter-tag">
+                        Cuisine: @(char.ToUpper(selectedCuis[0]) + selectedCuis.Substring(1))
+                        <button type="button" class="remove-filter-btn" data-filter="cuisine" title="Remove filter">&times;</button>
+                    </span>
+                }
+                if (!string.IsNullOrEmpty(searchQ))
+                {
+                    <span class="filter-tag">
+                        Search: @searchQ
+                        <button type="button" class="remove-filter-btn" data-filter="search" title="Remove filter">&times;</button>
+                    </span>
+                }
+            }
+        </div>
+    </aside>
+
+    <main class="dishes-grid fade-in-grid" id="recipesGrid">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center w-100 my-5" style="grid-column: 1 / -1;">
+                <p class="lead">No recipes found. Try a different search or remove filters!</p>
+            </div>
+        }
+        else
+        {
+            foreach (var meal in Model)
+            {
+                bool isFav = favIds.Contains(meal.IdMeal);
+                bool hasRating = ratingsDict.TryGetValue(meal.IdMeal, out var ratingInfo);
+                double avg = hasRating ? ratingInfo.AverageScore : 0.0;
+                int votes = hasRating ? ratingInfo.VotesCount : 0;
+
+                <div class="dish-item-card">
+                    <a href="/Recipe/Details/@meal.IdMeal" style="display: block; color: inherit; text-decoration: none;">
+                        <div class="dish-image-wrapper">
+                            <img src="@meal.StrMealThumb" alt="@meal.StrMeal" loading="lazy" />
+                            <div class="dish-hover-overlay">
+                                <span>Category: @(meal.StrCategory ?? "N/A")</span>
+                                <span>Cuisine: @(meal.StrArea ?? "N/A")</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="dish-card-content">
+                        <div class="dish-bottom-bar">
+                            <a href="/Recipe/Details/@meal.IdMeal" style="color: inherit; text-decoration: none; overflow: hidden; flex: 1;">
+                                <h4 class="dish-title" title="@meal.StrMeal">@meal.StrMeal</h4>
+                            </a>
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <button type="button"
+                                        class="favorite-btn @(isFav ? "active" : "")"
+                                        data-id="@meal.IdMeal"
+                                        data-title="@meal.StrMeal"
+                                        data-thumb="@meal.StrMealThumb"
+                                        data-category="@meal.StrCategory"
+                                        data-area="@meal.StrArea"
+                                        title="Save to favorites">
+                                    <svg class="heart-icon" viewBox="0 0 24 24" width="22" height="22">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                    </svg>
+                                </button>
+                            }
+                        </div>
+
+                        <!-- System Gwiazdek wraz ze średnią ocen oraz liczbą głosów -->
+                        <div class="star-rating-box" data-id="@meal.IdMeal" title="Click to rate this recipe">
+                            <div class="stars-wrapper">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star @(i <= Math.Round(avg) ? "filled" : "")" data-value="@i">&#9733;</span>
+                                }
+                            </div>
+                            <span class="rating-value">
+                                @if (votes > 0)
+                                {
+                                    <span><strong>@avg.ToString("0.0")</strong> (@votes @(votes == 1 ? "vote" : "votes"))</span>
+                                }
+                                else
+                                {
+                                    <span>No votes yet</span>
+                                }
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+    </main>
+</div>
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    <div class="pagination-wrapper my-5">
+        <div class="pagination-container">
+            @if (currentPage > 1)
+            {
+                <a href="javascript:void(0)" data-page="@(currentPage - 1)" class="page-btn ajax-page-btn nav-btn" title="Previous page">&laquo;</a>
+            }
+
+            <a href="javascript:void(0)" data-page="1" class="page-btn ajax-page-btn @(currentPage == 1 ? "active" : "")">1</a>
+
+            @if (currentPage > 3)
+            {
+                <span class="pagination-dots">...</span>
+            }
+
+            @for (int i = Math.Max(2, currentPage - 1); i <= Math.Min(totalPages - 1, currentPage + 1); i++)
+            {
+                <a href="javascript:void(0)" data-page="@i" class="page-btn ajax-page-btn @(currentPage == i ? "active" : "")">@i</a>
+            }
+
+            @if (currentPage < totalPages - 2)
+            {
+                <span class="pagination-dots">...</span>
+            }
+
+            @if (totalPages > 1)
+            {
+                <a href="javascript:void(0)" data-page="@totalPages" class="page-btn ajax-page-btn @(currentPage == totalPages ? "active" : "")">@totalPages</a>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <a href="javascript:void(0)" data-page="@(currentPage + 1)" class="page-btn ajax-page-btn nav-btn" title="Next page">&raquo;</a>
+            }
+        </div>
+
+        <div class="page-jump-box">
+            <span>Jump to page:</span>
+            <input type="number" id="pageJumpInput" min="1" max="@totalPages" value="@currentPage" />
+        </div>
+    </div>
+}

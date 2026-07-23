@@ -1,48 +1,368 @@
-﻿@model SmakoszApp.Models.Recipe
+﻿@model SmakoszApp.Models.ExternalMeal
 
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.StrMeal;
+    double avgScore = ViewBag.AverageScore ?? 0.0;
+    int totalVotes = ViewBag.TotalVotes ?? 0;
+    var breakdown = ViewBag.StarBreakdown as Dictionary<int, int> ?? new Dictionary<int, int>();
+    bool isFav = ViewBag.IsFavorite ?? false;
+
+    // Pobranie ID wideo z YouTube
+    string youtubeEmbedUrl = "";
+    if (!string.IsNullOrEmpty(Model.StrYoutube) && Model.StrYoutube.Contains("v="))
+    {
+        var videoId = Model.StrYoutube.Split("v=")[1].Split("&")[0];
+        youtubeEmbedUrl = $"https://www.youtube.com/embed/{videoId}";
+    }
+
+    // Wykorzystujemy metodę GetIngredientsList() z klasy ExternalMeal
+    var ingredientsList = Model.GetIngredientsList();
+
+    // Czyszczenie i parsowanie kroków instrukcji
+    var rawInstructions = Model.StrInstructions ?? "";
+
+    var lines = rawInstructions
+            .Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(l => l.Trim())
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .ToList();
+
+    var steps = new List<string>();
+
+    for (int i = 0; i < lines.Count; i++)
+    {
+        var currentLine = lines[i];
+
+        // Jeśli linia zawiera sam nagłówek "STEP 1", "STEP 2" itp., łączy ją z kolejną linią z opisanym krokiem
+        if (System.Text.RegularExpressions.Regex.IsMatch(currentLine, @"^STEP\s*\d+:?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+        {
+            if (i + 1 < lines.Count)
+            {
+                steps.Add(lines[i + 1]);
+                i++;
+            }
+        }
+        else
+        {
+            // Usuwa zbędne przedrostki typu "STEP 1:" na początku tekstu, zapobiegając powielaniu numeracji
+            var sanitized = System.Text.RegularExpressions.Regex.Replace(currentLine, @"^STEP\s*\d+:?\s*", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (!string.IsNullOrWhiteSpace(sanitized))
+            {
+                steps.Add(sanitized);
+            }
+        }
+    }
+
+    // Podział po kropkach w przypadku braku odnośników nowych linii w surowym tekście
+    if (steps.Count <= 1 && rawInstructions.Length > 150)
+    {
+        steps = rawInstructions
+            .Split(new[] { ". " }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim().TrimEnd('.'))
+            .Where(s => s.Length > 10)
+            .ToList();
+    }
+
+    var commentsList = ViewBag.Comments as List<SmakoszApp.Models.Comment> ?? new List<SmakoszApp.Models.Comment>();
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/recipe-details.css" asp-append-version="true" />
 }
 
-<div class="recipe-details-container">
+<div class="recipe-details-container my-4">
+
+    <!-- TOP HERO SECTION -->
     <div class="details-top-section">
         <div class="details-image-box">
-            <img src="@Model.ImagePath" alt="@Model.Title" />
+            <img src="@Model.StrMealThumb" alt="@Model.StrMeal" />
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <button type="button"
+                        class="details-favorite-btn @(isFav ? "active" : "")"
+                        data-id="@Model.IdMeal"
+                        data-title="@Model.StrMeal"
+                        data-thumb="@Model.StrMealThumb"
+                        data-category="@Model.StrCategory"
+                        data-area="@Model.StrArea">
+                    <svg class="heart-icon" viewBox="0 0 24 24" width="26" height="26">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                </button>
+            }
         </div>
 
         <div class="details-info-box">
-            <h1 class="details-title">@Model.Title</h1>
+            <h1 class="details-title">@Model.StrMeal</h1>
 
-            <div class="details-meta">
-                <span>🕒 @Model.PrepTimeMinutes min</span>
-                <span>@Model.Calories kcal</span>
+            <div class="details-tags-row">
+                @if (!string.IsNullOrEmpty(Model.StrArea))
+                {
+                    <span class="info-pill">🌍 Cuisine: <strong>@Model.StrArea</strong></span>
+                }
+                @if (!string.IsNullOrEmpty(Model.StrCategory))
+                {
+                    <span class="info-pill">🏷️ Category: <strong>@Model.StrCategory</strong></span>
+                }
             </div>
 
-            <div class="details-ingredients">
-                <h3>Składniki</h3>
-                <ul>
-                    @if (Model.Ingredients != null && Model.Ingredients.Any())
+            <!-- INGREDIENTS LIST -->
+            <div class="details-ingredients-card">
+                <h3>Ingredients Required</h3>
+                <p class="ingredients-hint">Check items as you prepare:</p>
+                <ul class="ingredients-list">
+                    @foreach (var ingredient in ingredientsList)
                     {
-                        foreach (var ing in Model.Ingredients)
-                        {
-                            <li>@ing.Name</li>
-                        }
+                        <li>
+                            <label class="ingredient-checkbox-label">
+                                <input type="checkbox" class="ingredient-checkbox" />
+                                <span class="checkbox-custom"></span>
+                                <span class="ingredient-text">@ingredient</span>
+                            </label>
+                        </li>
                     }
                 </ul>
             </div>
         </div>
     </div>
 
-    <div class="details-instructions">
-        <h3>Sposób przygotowania</h3>
-        <p>@Model.Instructions</p>
+    <!-- INSTRUCTIONS SECTION -->
+    <div class="details-instructions-card my-5">
+        <h2>Preparation Steps</h2>
+        <div class="steps-wrapper">
+            @if (steps.Any())
+            {
+                int stepNum = 1;
+                foreach (var step in steps)
+                {
+                    <div class="step-item">
+                        <div class="step-number">@stepNum</div>
+                        <div class="step-text">@step</div>
+                    </div>
+                    stepNum++;
+                }
+            }
+            else
+            {
+                <p>No preparation steps available for this recipe.</p>
+            }
+        </div>
     </div>
 
-    <div class="details-actions">
-        <a href="/Home/Index" class="back-home-btn">wróć na stronę główną</a>
+    <!-- VIDEO SECTION -->
+    @if (!string.IsNullOrEmpty(youtubeEmbedUrl))
+    {
+        <div class="details-video-card my-5">
+            <h2>Video Tutorial</h2>
+            <div class="video-responsive-wrapper">
+                <iframe src="@youtubeEmbedUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    }
+
+    <!-- RATINGS BREAKDOWN & USER RATING SECTION -->
+    <div class="details-ratings-card my-5">
+        <h2>Community Ratings</h2>
+
+        <div class="ratings-dashboard">
+            <!-- Left Score Summary -->
+            <div class="rating-summary-box">
+                <div class="big-score">@(avgScore > 0 ? avgScore.ToString("0.0") : "0.0")</div>
+                <div class="stars-display">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span class="star @(i <= Math.Round(avgScore) ? "filled" : "")">&#9733;</span>
+                    }
+                </div>
+                <div class="total-votes-count">Based on <strong>@totalVotes</strong> @(totalVotes == 1 ? "review" : "reviews")</div>
+
+                <!-- Interactive Rating Action -->
+                <div class="user-rate-action mt-3">
+                    <span>Rate this recipe:</span>
+                    <div class="interactive-stars" data-id="@Model.IdMeal">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="interactive-star" data-value="@i">&#9733;</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Progress Bar Breakdown -->
+            <div class="rating-bars-box">
+                @for (int star = 5; star >= 1; star--)
+                {
+                    int count = breakdown.ContainsKey(star) ? breakdown[star] : 0;
+                    double percent = totalVotes > 0 ? (double)count / totalVotes * 100 : 0;
+
+                    <div class="bar-row">
+                        <span class="star-label">@star ★</span>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: @percent.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)%;"></div>
+                        </div>
+                        <span class="count-label">@count</span>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
+
+    <!-- COMMENTS SECTION -->
+    <div class="details-comments-card my-5">
+        <h2>Discussion & Tips (@commentsList.Count)</h2>
+
+        <!-- Formularz dodawania komentarza -->
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <div class="add-comment-box mb-4">
+                <textarea id="commentInput" class="comment-textarea" rows="3" placeholder="Share your cooking tips or thoughts about this recipe..."></textarea>
+                <div class="text-end mt-2">
+                    <button type="button" id="submitCommentBtn" class="btn-submit-comment" data-id="@Model.IdMeal">Post Comment</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="guest-comment-notice mb-4 text-center">
+                <p>Want to join the discussion and earn Leaderboard points? <a href="/Account/Index">Log in or Sign Up</a></p>
+            </div>
+        }
+
+        <!-- Lista komentarzy -->
+        <div class="comments-list" id="commentsContainer">
+            @if (!commentsList.Any())
+            {
+                <p class="no-comments-text text-center py-3">No comments yet. Be the first to share your thoughts!</p>
+            }
+            else
+            {
+                foreach (var c in commentsList)
+                {
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">@(c.User?.Login ?? "Anonymous")</span>
+                            <span class="comment-date">@c.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                        </div>
+                        <p class="comment-text">@c.Text</p>
+                        <div class="comment-actions">
+                            <button type="button" class="like-comment-btn" data-id="@c.Id">
+                                👍 <span class="like-count">@c.LikesCount</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- BACK ACTION -->
+    <div class="details-actions my-5 text-center">
+        <a href="/Home/Index" class="back-home-btn">&larr; Back to Recipes</a>
+    </div>
+
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Obsługa klikania ulubionych w szczegółach
+            const favBtn = document.querySelector('.details-favorite-btn');
+            if (favBtn) {
+                favBtn.addEventListener('click', async function () {
+                    const recipeId = this.dataset.id;
+                    const title = this.dataset.title;
+                    const thumb = this.dataset.thumb;
+                    const category = this.dataset.category;
+                    const area = this.dataset.area;
+
+                    try {
+                        const response = await fetch(`/Recipe/ToggleFavorite?recipeId=${recipeId}&title=${encodeURIComponent(title)}&thumb=${encodeURIComponent(thumb)}&category=${encodeURIComponent(category)}&area=${encodeURIComponent(area)}`, {
+                            method: 'POST'
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.isFavorite) {
+                                this.classList.add('active');
+                            } else {
+                                this.classList.remove('active');
+                            }
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            }
+
+            // Obsługa interaktywnego oceniania gwiazdkami w szczegółach
+            const stars = document.querySelectorAll('.interactive-star');
+            const recipeId = "@Model.IdMeal";
+
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', function () {
+                    const val = parseInt(this.dataset.value);
+                    stars.forEach(s => {
+                        if (parseInt(s.dataset.value) <= val) s.classList.add('hovered');
+                        else s.classList.remove('hovered');
+                    });
+                });
+
+                star.addEventListener('click', async function () {
+                    const score = parseInt(this.dataset.value);
+                    try {
+                        const response = await fetch(`/Recipe/RateRecipe?recipeId=${recipeId}&score=${score}`, { method: 'POST' });
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            });
+
+            document.querySelector('.interactive-stars')?.addEventListener('mouseleave', function () {
+                stars.forEach(s => s.classList.remove('hovered'));
+            });
+
+        });
+
+        // Wysyłanie komentarza bez przeładowania
+        document.getElementById('submitCommentBtn')?.addEventListener('click', async function () {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            const recipeId = this.dataset.id;
+
+            if (!text) return;
+
+            try {
+                const response = await fetch(`/Recipe/AddComment?recipeId=${recipeId}&text=${encodeURIComponent(text)}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        // Polubienia komentarzy
+        document.querySelectorAll('.like-comment-btn').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const commentId = this.dataset.id;
+                try {
+                    const response = await fetch(`/Recipe/LikeComment?commentId=${commentId}`, { method: 'POST' });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.querySelector('.like-count').textContent = data.likes;
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        });
+    </script>
+}
