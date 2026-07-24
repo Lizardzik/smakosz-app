@@ -223,3 +223,398 @@ h1, h2, h3, h4, h5, h6, .logo-font {
         transform: none;
     }
 }
+/* DARK MODE */
+
+body.dark-theme {
+    background-color: #1E2029 !important;
+    color: #E0E0E0 !important;
+}
+
+    /* 1. BIAŁE LOGO */
+    body.dark-theme .nav-logo-img {
+        filter: brightness(0) invert(1) !important;
+    }
+
+    /* 2. NAVBAR & FOOTER */
+    body.dark-theme .custom-navbar {
+        background-color: #181920 !important;
+        border-bottom: 2px solid #2A2D3D !important;
+    }
+
+    body.dark-theme .nav-link,
+    body.dark-theme .custom-dropdown-item {
+        color: #E0E0E0 !important;
+    }
+
+    body.dark-theme .custom-dropdown-menu {
+        background-color: #2A2D3D !important;
+        border: 1.5px solid #40455B !important;
+    }
+
+    body.dark-theme .custom-dropdown-item:hover {
+        background-color: #383C52 !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .custom-dropdown-item.text-danger {
+        color: #FF6B6B !important;
+    }
+
+    body.dark-theme .smakosz-simple-footer {
+        background-color: #181920 !important;
+        border-top: 2px solid #2A2D3D !important;
+    }
+
+    body.dark-theme .footer-brand-title,
+    body.dark-theme .footer-heading,
+    body.dark-theme .footer-link {
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .footer-tagline,
+    body.dark-theme .footer-info-text,
+    body.dark-theme .footer-copy {
+        color: #808598 !important;
+    }
+
+    /* 3. STRONA GŁÓWNA - WYSZUKIWARKA, FILTRY I ELEMENTY STRONY */
+    body.dark-theme .search-box-input {
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+        body.dark-theme .search-box-input::placeholder {
+            color: #A0A5B5 !important;
+        }
+
+    body.dark-theme .divider-line {
+        color: #A0A5B5 !important;
+    }
+
+        body.dark-theme .divider-line::before,
+        body.dark-theme .divider-line::after {
+            border-bottom-color: #40455B !important;
+        }
+
+    body.dark-theme .results-info-bar {
+        color: #A0A5B5 !important;
+    }
+
+    body.dark-theme .custom-filter-btn {
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    }
+
+    body.dark-theme .custom-dropdown-content {
+        background-color: #2A2D3D !important;
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .radio-label {
+        color: #E0E0E0 !important;
+    }
+
+    body.dark-theme .radio-circle {
+        border-color: #A0A5B5 !important;
+    }
+
+    body.dark-theme .radio-label input:checked + .radio-circle::after {
+        background-color: #FFFFFF !important;
+    }
+
+    body.dark-theme .active-filters-panel {
+        border-color: #40455B !important;
+    }
+
+        body.dark-theme .active-filters-panel h3 {
+            color: #A0A5B5 !important;
+        }
+
+    body.dark-theme .filter-tag {
+        background-color: #383C52 !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .remove-filter-btn {
+        color: #A0A5B5 !important;
+    }
+
+        body.dark-theme .remove-filter-btn:hover {
+            color: #FF6B6B !important;
+        }
+
+    body.dark-theme .empty-filters-text {
+        color: #A0A5B5 !important;
+    }
+
+    /* 4. KARTY PRZEPISÓW (HOME / FAVORITES) */
+    body.dark-theme .dish-item-card {
+        background-color: #2A2D3D !important;
+        border: 2px solid #40455B !important;
+    }
+
+    body.dark-theme .dish-title,
+    body.dark-theme .dish-bottom-bar h4,
+    body.dark-theme .dish-card-content h4 {
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .dish-bottom-bar {
+        background-color: #2A2D3D !important;
+    }
+
+    /* 5. PAGINACJA */
+    body.dark-theme .page-btn {
+        border-color: #40455B !important;
+        color: #E0E0E0 !important;
+    }
+
+        body.dark-theme .page-btn:hover,
+        body.dark-theme .page-btn.active {
+            background-color: #383C52 !important;
+            color: #FFFFFF !important;
+        }
+
+    body.dark-theme .pagination-dots,
+    body.dark-theme .page-jump-box {
+        color: #A0A5B5 !important;
+    }
+
+        body.dark-theme .page-jump-box input {
+            background-color: #2A2D3D !important;
+            border-color: #40455B !important;
+            color: #FFFFFF !important;
+            color-scheme: dark;
+        }
+
+    /* 6. ACCOUNT SETTINGS */
+    body.dark-theme .settings-form,
+    body.dark-theme form.settings-form {
+        background-color: #2A2D3D !important;
+        border: 1.5px solid #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+        body.dark-theme .settings-form h5,
+        body.dark-theme .settings-form label,
+        body.dark-theme .settings-form .form-label,
+        body.dark-theme .settings-form .form-check-label {
+            color: #FFFFFF !important;
+            opacity: 0.95;
+        }
+
+        body.dark-theme .settings-form input.form-control {
+            background-color: #1E2029 !important;
+            color: #FFFFFF !important;
+            border: 1.5px solid #40455B !important;
+        }
+
+            body.dark-theme .settings-form input.form-control:focus {
+                background-color: #1E2029 !important;
+                color: #FFFFFF !important;
+                border-color: #6C728E !important;
+                box-shadow: 0 0 0 0.25rem rgba(108, 114, 142, 0.25) !important;
+            }
+
+        body.dark-theme .settings-form .btn-outline-dark {
+            color: #FFFFFF !important;
+            border-color: #6C728E !important;
+            background-color: transparent !important;
+        }
+
+            body.dark-theme .settings-form .btn-outline-dark:hover {
+                background-color: #383C52 !important;
+                border-color: #FFFFFF !important;
+            }
+
+        body.dark-theme .settings-form button[type="submit"] {
+            background-color: #383C52 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #505670 !important;
+        }
+
+            body.dark-theme .settings-form button[type="submit"]:hover {
+                background-color: #484E6B !important;
+            }
+
+        body.dark-theme .settings-form hr {
+            border-color: #40455B !important;
+            opacity: 0.5;
+        }
+
+    /* 7. CONTACT PAGE */
+    body.dark-theme .contact-header-text h2,
+    body.dark-theme .contact-header-text .subtitle-1,
+    body.dark-theme .contact-header-text .contact-email-highlight {
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .contact-header-text .subtitle-2 {
+        color: #A0A5B5 !important;
+    }
+
+    body.dark-theme .contact-card-box {
+        background-color: #2A2D3D !important;
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .contact-round-input,
+    body.dark-theme .contact-round-textarea {
+        background-color: #1E2029 !important;
+        color: #FFFFFF !important;
+        border-color: #40455B !important;
+    }
+
+        body.dark-theme .contact-round-input::placeholder,
+        body.dark-theme .contact-round-textarea::placeholder {
+            color: #A0A5B5 !important;
+        }
+
+        body.dark-theme .contact-round-input:focus,
+        body.dark-theme .contact-round-textarea:focus {
+            background-color: #1E2029 !important;
+            border-color: #6C728E !important;
+        }
+
+    body.dark-theme .contact-pill-btn {
+        background-color: #383C52 !important;
+        border-color: #505670 !important;
+        color: #FFFFFF !important;
+    }
+
+        body.dark-theme .contact-pill-btn:hover {
+            background-color: #484E6B !important;
+            color: #FFFFFF !important;
+        }
+
+    /* 8. RECIPE DETAILS PAGE */
+    body.dark-theme .recipe-details-container {
+        color: #E0E0E0 !important;
+    }
+
+    body.dark-theme .details-title,
+    body.dark-theme .details-ingredients-card h3,
+    body.dark-theme .details-instructions-card h2,
+    body.dark-theme .details-video-card h2,
+    body.dark-theme .details-ratings-card h2,
+    body.dark-theme .details-comments-card h2 {
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .details-ingredients-card,
+    body.dark-theme .details-instructions-card,
+    body.dark-theme .details-video-card,
+    body.dark-theme .details-ratings-card,
+    body.dark-theme .details-comments-card {
+        background-color: #2A2D3D !important;
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .info-pill {
+        background-color: #383C52 !important;
+        border-color: #505670 !important;
+        color: #FFFFFF !important;
+    }
+
+    body.dark-theme .ingredients-hint,
+    body.dark-theme .total-votes-count,
+    body.dark-theme .count-label,
+    body.dark-theme .comment-date {
+        color: #A0A5B5 !important;
+    }
+
+    body.dark-theme .ingredients-list li {
+        border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body.dark-theme .checkbox-custom {
+        border-color: #A0A5B5 !important;
+        background-color: #1E2029 !important;
+    }
+
+    body.dark-theme .ingredient-checkbox:checked + .checkbox-custom {
+        background-color: #383C52 !important;
+        border-color: #383C52 !important;
+    }
+
+    body.dark-theme .details-favorite-btn {
+        background-color: #2A2D3D !important;
+        border-color: #40455B !important;
+    }
+
+        body.dark-theme .details-favorite-btn .heart-icon {
+            stroke: #FFFFFF !important;
+        }
+
+    body.dark-theme .rating-summary-box {
+        border-right-color: rgba(255, 255, 255, 0.1) !important;
+        border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    body.dark-theme .bar-container {
+        background-color: #1E2029 !important;
+        border-color: #40455B !important;
+    }
+
+    body.dark-theme .comment-textarea,
+    body.dark-theme .comment-item,
+    body.dark-theme .guest-comment-notice {
+        background-color: #1E2029 !important;
+        border-color: #40455B !important;
+        color: #FFFFFF !important;
+    }
+
+        body.dark-theme .comment-author,
+        body.dark-theme .guest-comment-notice a {
+            color: #FFFFFF !important;
+        }
+
+    body.dark-theme .btn-submit-comment,
+    body.dark-theme .like-comment-btn,
+    body.dark-theme .back-home-btn {
+        background-color: #383C52 !important;
+        border-color: #505670 !important;
+        color: #FFFFFF !important;
+    }
+
+        body.dark-theme .btn-submit-comment:hover,
+        body.dark-theme .like-comment-btn:hover,
+        body.dark-theme .back-home-btn:hover {
+            background-color: #484E6B !important;
+            color: #FFFFFF !important;
+        }
+
+    /* 9. LEADERBOARD */
+    body.dark-theme .leaderboard-card,
+    body.dark-theme .leaderboard-container,
+    body.dark-theme .leaderboard-table,
+    body.dark-theme .leaderboard-row,
+    body.dark-theme .rank-item {
+        background-color: #2A2D3D !important;
+        color: #FFFFFF !important;
+        border-color: #40455B !important;
+    }
+
+    body.dark-theme .leaderboard-row,
+    body.dark-theme .rank-item {
+        background-color: #1E2029 !important;
+    }
+
+    body.dark-theme .leaderboard-subtitle,
+    body.dark-theme .rank-header,
+    body.dark-theme .rank-label {
+        color: #A0A5B5 !important;
+    }
+    body.dark-theme .favorite-btn .heart-icon {
+        stroke: #FFFFFF !important;
+        filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
+    }
+
+    body.dark-theme .favorite-btn.active .heart-icon {
+        fill: #E63946 !important;
+        stroke: #E63946 !important;
+    }

@@ -11,11 +11,13 @@ namespace SmakoszApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly MealApiService _mealApiService;
+        private readonly IContentModerationService _moderationService;
 
-        public RecipeController(ApplicationDbContext context, MealApiService mealApiService)
+        public RecipeController(ApplicationDbContext context, MealApiService mealApiService, IContentModerationService moderationService)
         {
             _context = context;
             _mealApiService = mealApiService;
+            _moderationService = moderationService;
         }
 
         [HttpPost]
@@ -190,13 +192,28 @@ namespace SmakoszApp.Controllers
         public async Task<IActionResult> AddComment(string recipeId, string text)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
+            if (string.IsNullOrEmpty(userIdString))
+                return Unauthorized();
 
             if (string.IsNullOrWhiteSpace(text) || text.Length < 3)
             {
-                return BadRequest("Comment is too short.");
+                return Json(new { success = false, message = "Comment is too short." });
             }
 
+            // 1. MODERACJA TEKSTU
+            var (isAllowed, reason) = await _moderationService.ValidateTextAsync(text);
+
+            // Jeśli tekst jest zablokowany -> NATYCHMIAST PRZERWYJ I ZWRÓĆ ERROR
+            if (!isAllowed)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Your comment violates community guidelines and contains inappropriate language."
+                });
+            }
+
+            // 2. TWORZENIE KOMENTARZA
             int userId = int.Parse(userIdString);
 
             var comment = new Comment
@@ -246,6 +263,123 @@ namespace SmakoszApp.Controllers
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, likes = comment.LikesCount });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveCustomRecipe(
+            string externalId,
+            string title,
+            string ingredients,
+            string instructions,
+            string category,
+            string area,
+            string thumb,
+            bool overwrite = false)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
+
+            int userId = int.Parse(userIdString);
+
+            var existingCustom = await _context.CustomRecipes
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.ExternalMealId == externalId);
+
+            if (existingCustom != null && !overwrite)
+            {
+                return Json(new
+                {
+                    success = false,
+                    exists = true,
+                    message = "You already have a customized version of this recipe. Would you like to overwrite it or save as a new version?"
+                });
+            }
+
+            var (titleOk, _) = await _moderationService.ValidateTextAsync(title);
+            var (instOk, _) = await _moderationService.ValidateTextAsync(instructions);
+
+            if (!titleOk || !instOk)
+            {
+                return Json(new { success = false, message = "Your changes contain prohibited content or profanity." });
+            }
+
+            if (existingCustom != null && overwrite)
+            {
+                existingCustom.Title = title;
+                existingCustom.Ingredients = ingredients;
+                existingCustom.Instructions = instructions;
+                existingCustom.UpdatedAt = DateTime.Now;
+            }
+            else
+            {
+                var custom = new CustomRecipe
+                {
+                    UserId = userId,
+                    ExternalMealId = externalId,
+                    Title = title ?? "My version",
+                    Category = category ?? "",
+                    Area = area ?? "",
+                    ThumbUrl = thumb ?? "",
+                    Ingredients = ingredients ?? "",
+                    Instructions = instructions ?? "",
+                    UpdatedAt = DateTime.Now
+                };
+                _context.CustomRecipes.Add(custom);
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Your customized recipe has been saved in 'My Saved Recipes'!" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Saved()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Index", "Account");
+
+            int userId = int.Parse(userIdString);
+
+            var customRecipes = await _context.CustomRecipes
+                .Where(c => c.UserId == userId)
+                .OrderByDescending(c => c.UpdatedAt)
+                .ToListAsync();
+
+            return View(customRecipes);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCustomRecipe(int id)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
+
+            int userId = int.Parse(userIdString);
+
+            var custom = await _context.CustomRecipes
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+
+            if (custom != null)
+            {
+                _context.CustomRecipes.Remove(custom);
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CustomDetails(int id)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Index", "Account");
+
+            int userId = int.Parse(userIdString);
+
+            var customRecipe = await _context.CustomRecipes
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+
+            if (customRecipe == null) return NotFound();
+
+            return View(customRecipe);
         }
     }
 }

@@ -1,0 +1,61 @@
+﻿@model List<SmakoszApp.Models.CustomRecipe>
+
+@{
+    ViewData["Title"] = "My Saved Recipes";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold font-serif display-5">My Saved Recipes</h1>
+        <p class="text-muted">Your customized versions and private recipe edits</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted">You haven't saved any customized recipes yet.</h4>
+            <p>Browse recipes and click <strong>"Customize & Save My Version"</strong> to tweak them for yourself!</p>
+            <a href="/Home/Index" class="btn btn-dark rounded-pill px-4 mt-3">Discover Recipes</a>
+        </div>
+    }
+    else
+    {
+        <div class="dishes-grid">
+            @foreach (var recipe in Model)
+            {
+                <div class="dish-item-card position-relative d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="dish-card-image-box">
+                            <img src="@recipe.ThumbUrl" alt="@recipe.Title" class="dish-image" style="object-fit: cover; height: 220px; width: 100%; border-radius: 16px 16px 0 0;" />
+                        </div>
+
+                        <div class="dish-card-content p-3">
+                            <span class="badge bg-warning text-dark mb-2 font-monospace">Custom Version</span>
+                            <h4 class="dish-title text-truncate fw-bold font-serif fs-5">@recipe.Title</h4>
+                            <p class="text-muted small mb-0">Updated: @recipe.UpdatedAt.ToString("MMM dd, yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 pt-0">
+                        <div class="d-flex flex-column gap-2 mt-2">
+                            <a href="/Recipe/CustomDetails/@recipe.Id" class="btn btn-dark btn-sm rounded-pill w-100 fw-semibold">View My Version</a>
+
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <a href="/Recipe/Details/@recipe.ExternalMealId" class="btn btn-sm btn-outline-secondary rounded-pill w-100">Original</a>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill delete-custom-btn px-3" data-id="@recipe.Id">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/saved-recipes.js" asp-append-version="true"></script>
+}

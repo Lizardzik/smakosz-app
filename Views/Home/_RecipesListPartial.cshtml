@@ -29,21 +29,21 @@
                 if (!string.IsNullOrEmpty(selectedCat))
                 {
                     <span class="filter-tag">
-                        Category: @(char.ToUpper(selectedCat[0]) + selectedCat.Substring(1))
+                        @(char.ToUpper(selectedCat[0]) + selectedCat.Substring(1))
                         <button type="button" class="remove-filter-btn" data-filter="category" title="Remove filter">&times;</button>
                     </span>
                 }
                 if (!string.IsNullOrEmpty(selectedCuis))
                 {
                     <span class="filter-tag">
-                        Cuisine: @(char.ToUpper(selectedCuis[0]) + selectedCuis.Substring(1))
+                        @(char.ToUpper(selectedCuis[0]) + selectedCuis.Substring(1))
                         <button type="button" class="remove-filter-btn" data-filter="cuisine" title="Remove filter">&times;</button>
                     </span>
                 }
                 if (!string.IsNullOrEmpty(searchQ))
                 {
                     <span class="filter-tag">
-                        Search: @searchQ
+                        "@searchQ"
                         <button type="button" class="remove-filter-btn" data-filter="search" title="Remove filter">&times;</button>
                     </span>
                 }
@@ -124,53 +124,53 @@
                 </div>
             }
         }
+
+        <!-- Paginacja przeniesiona do wnętrza main (#recipesGrid) -->
+        @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+        {
+            int currentPage = ViewBag.CurrentPage;
+            int totalPages = ViewBag.TotalPages;
+
+            <div class="pagination-wrapper my-5">
+                <div class="pagination-container">
+                    @if (currentPage > 1)
+                    {
+                        <a href="javascript:void(0)" data-page="@(currentPage - 1)" class="page-btn ajax-page-btn nav-btn" title="Previous page">&laquo;</a>
+                    }
+
+                    <a href="javascript:void(0)" data-page="1" class="page-btn ajax-page-btn @(currentPage == 1 ? "active" : "")">1</a>
+
+                    @if (currentPage > 3)
+                    {
+                        <span class="pagination-dots">...</span>
+                    }
+
+                    @for (int i = Math.Max(2, currentPage - 1); i <= Math.Min(totalPages - 1, currentPage + 1); i++)
+                    {
+                        <a href="javascript:void(0)" data-page="@i" class="page-btn ajax-page-btn @(currentPage == i ? "active" : "")">@i</a>
+                    }
+
+                    @if (currentPage < totalPages - 2)
+                    {
+                        <span class="pagination-dots">...</span>
+                    }
+
+                    @if (totalPages > 1)
+                    {
+                        <a href="javascript:void(0)" data-page="@totalPages" class="page-btn ajax-page-btn @(currentPage == totalPages ? "active" : "")">@totalPages</a>
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a href="javascript:void(0)" data-page="@(currentPage + 1)" class="page-btn ajax-page-btn nav-btn" title="Next page">&raquo;</a>
+                    }
+                </div>
+
+                <div class="page-jump-box">
+                    <span>Jump to page:</span>
+                    <input type="number" id="pageJumpInput" min="1" max="@totalPages" value="@currentPage" />
+                </div>
+            </div>
+        }
     </main>
 </div>
-
-<!-- Pagination -->
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-{
-    int currentPage = ViewBag.CurrentPage;
-    int totalPages = ViewBag.TotalPages;
-
-    <div class="pagination-wrapper my-5">
-        <div class="pagination-container">
-            @if (currentPage > 1)
-            {
-                <a href="javascript:void(0)" data-page="@(currentPage - 1)" class="page-btn ajax-page-btn nav-btn" title="Previous page">&laquo;</a>
-            }
-
-            <a href="javascript:void(0)" data-page="1" class="page-btn ajax-page-btn @(currentPage == 1 ? "active" : "")">1</a>
-
-            @if (currentPage > 3)
-            {
-                <span class="pagination-dots">...</span>
-            }
-
-            @for (int i = Math.Max(2, currentPage - 1); i <= Math.Min(totalPages - 1, currentPage + 1); i++)
-            {
-                <a href="javascript:void(0)" data-page="@i" class="page-btn ajax-page-btn @(currentPage == i ? "active" : "")">@i</a>
-            }
-
-            @if (currentPage < totalPages - 2)
-            {
-                <span class="pagination-dots">...</span>
-            }
-
-            @if (totalPages > 1)
-            {
-                <a href="javascript:void(0)" data-page="@totalPages" class="page-btn ajax-page-btn @(currentPage == totalPages ? "active" : "")">@totalPages</a>
-            }
-
-            @if (currentPage < totalPages)
-            {
-                <a href="javascript:void(0)" data-page="@(currentPage + 1)" class="page-btn ajax-page-btn nav-btn" title="Next page">&raquo;</a>
-            }
-        </div>
-
-        <div class="page-jump-box">
-            <span>Jump to page:</span>
-            <input type="number" id="pageJumpInput" min="1" max="@totalPages" value="@currentPage" />
-        </div>
-    </div>
-}

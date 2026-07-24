@@ -1,0 +1,109 @@
+﻿@model List<SmakoszApp.Models.User>
+
+@{
+    ViewData["Title"] = "Community";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string currentSearch = ViewBag.CurrentSearch ?? "";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/community.css" asp-append-version="true" />
+}
+
+<div class="container my-5">
+
+    <!-- HEADER & SEARCH BAR -->
+    <div class="community-header text-center mb-5">
+        <h1 class="fw-bold font-serif display-4">Food Enthusiasts</h1>
+        <p class="text-muted">Discover other cooks and community members</p>
+
+        <!-- Search Form -->
+        <form method="get" action="/Community/Index" class="community-search-form mt-4">
+            <div class="input-group search-input-wrapper">
+                <input type="text"
+                       name="search"
+                       class="form-control custom-search-input"
+                       placeholder="Search members by username..."
+                       value="@currentSearch" />
+                <button type="submit" class="btn btn-dark search-submit-btn">Search</button>
+            </div>
+            @if (!string.IsNullOrEmpty(currentSearch))
+            {
+                <div class="mt-2">
+                    <a href="/Community/Index" class="text-decoration-none small text-muted">&times; Clear search filter</a>
+                </div>
+            }
+        </form>
+    </div>
+
+    <!-- USERS GRID -->
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted">No members found matching "@currentSearch"</h4>
+            <a href="/Community/Index" class="btn btn-outline-dark rounded-pill px-4 mt-3">Show all members</a>
+        </div>
+    }
+    else
+    {
+        <div class="users-grid">
+            @foreach (var user in Model)
+            {
+                var avatarPath = !string.IsNullOrEmpty(user.ProfilePicturePath)
+                    ? user.ProfilePicturePath
+                    : "/default.png";
+
+                <div class="user-card">
+                    <div class="user-avatar-wrapper">
+                        <img src="@avatarPath" alt="@user.Login" class="user-avatar-img" />
+                    </div>
+                    <div class="user-info">
+                        <h3 class="user-username">@user.Login</h3>
+                        <span class="user-reputation-badge">🏆 @user.ReputationPoints pts</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- PAGINATION -->
+        @if (totalPages > 1)
+        {
+            <div class="pagination-wrapper mt-5">
+                <div class="pagination-container">
+                    @if (currentPage > 1)
+                    {
+                        <a href="/Community/Index?search=@currentSearch&page=@(currentPage - 1)" class="page-link-btn">&laquo;</a>
+                    }
+
+                    <a href="/Community/Index?search=@currentSearch&page=1" class="page-link-btn @(currentPage == 1 ? "active" : "")">1</a>
+
+                    @if (currentPage > 3)
+                    {
+                        <span class="pagination-dots">...</span>
+                    }
+
+                    @for (int p = Math.Max(2, currentPage - 1); p <= Math.Min(totalPages - 1, currentPage + 1); p++)
+                    {
+                        <a href="/Community/Index?search=@currentSearch&page=@p" class="page-link-btn @(currentPage == p ? "active" : "")">@p</a>
+                    }
+
+                    @if (currentPage < totalPages - 2)
+                    {
+                        <span class="pagination-dots">...</span>
+                    }
+
+                    @if (totalPages > 1)
+                    {
+                        <a href="/Community/Index?search=@currentSearch&page=@totalPages" class="page-link-btn @(currentPage == totalPages ? "active" : "")">@totalPages</a>
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a href="/Community/Index?search=@currentSearch&page=@(currentPage + 1)" class="page-link-btn">&raquo;</a>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

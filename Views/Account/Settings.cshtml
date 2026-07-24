@@ -1,0 +1,111 @@
+﻿@model SmakoszApp.Models.UserSettingsViewModel
+
+@{
+    ViewData["Title"] = "Account Settings";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+}
+
+<div class="smakosz-main-container my-5" style="max-width: 800px; margin: 0 auto;">
+    <h2 class="text-center mb-4 logo-font">Account Settings</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center mb-4">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Any()))
+    {
+        <div class="alert alert-danger mb-4">
+            @Html.ValidationSummary(false)
+        </div>
+    }
+
+    <form asp-action="Settings" method="post" enctype="multipart/form-data" class="settings-form shadow-sm p-4 rounded bg-white">
+
+        <!-- SEKCJA 1: AVATAR & MOTYW -->
+        <div class="row align-items-center mb-4 border-bottom pb-4">
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <div class="avatar-preview-box mb-2">
+                    <img src="@(string.IsNullOrEmpty(Model.CurrentProfilePicture) ? "/images/default-avatar.png" : Model.CurrentProfilePicture)"
+                         alt="Profile Picture"
+                         id="avatarPreview"
+                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #2D3142;" />
+                </div>
+                <label for="AvatarFile" class="btn btn-sm btn-outline-dark mt-2">Change Avatar</label>
+                <input type="file" id="AvatarFile" name="AvatarFile" accept="image/*" class="d-none" onchange="previewImage(event)" />
+            </div>
+
+            <div class="col-md-8">
+                <h5 class="fw-bold mb-3">Theme Mode</h5>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ThemePreference" id="themeLight" value="light" @(Model.ThemePreference == "light" ? "checked" : "")>
+                        <label class="form-check-label" for="themeLight">Light Theme</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ThemePreference" id="themeDark" value="dark" @(Model.ThemePreference == "dark" ? "checked" : "")>
+                        <label class="form-check-label" for="themeDark">Dark Theme</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKCJA 2: DANE PODSTAWOWE -->
+        <h5 class="fw-bold mb-3">Basic Information</h5>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input asp-for="Login" class="form-control" />
+            <span asp-validation-for="Login" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Email Address</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <!-- SEKCJA 3: ZMIANA HASŁA -->
+        <hr class="my-4" />
+        <h5 class="fw-bold mb-3">Change Password (optional)</h5>
+
+        <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input asp-for="CurrentPassword" type="password" class="form-control" autocomplete="off" />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">New Password</label>
+                <input asp-for="NewPassword" type="password" class="form-control" autocomplete="off" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Confirm New Password</label>
+                <input asp-for="ConfirmNewPassword" type="password" class="form-control" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-dark btn-lg px-4" style="background-color: #2D3142;">Save Settings</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById('avatarPreview');
+                output.src = reader.result;
+            };
+            if (event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
+}

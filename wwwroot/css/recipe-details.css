@@ -475,3 +475,44 @@
         color: var(--color-dark, #2D3142);
         font-weight: 700;
     }
+/* Styling avatarów w komentarzach */
+.comment-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-dark, #2D3142);
+    flex-shrink: 0;
+}
+
+/* Wstępny stan komunikatu o błędzie */
+#commentErrorBox {
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+/* Styling Baneru z Przycikiem Customizacji */
+.customize-banner-card {
+    background: var(--color-surface, #F8F9FA);
+    border: 2px dashed var(--color-dark, #2D3142);
+    border-radius: 20px;
+}
+
+.btn-customize-recipe {
+    background-color: var(--color-dark, #2D3142);
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+    .btn-customize-recipe:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+        background-color: #1a1c27;
+        color: #FFFFFF;
+    }

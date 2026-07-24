@@ -1,0 +1,73 @@
+﻿@model SmakoszApp.Models.CustomRecipe
+
+@{
+    ViewData["Title"] = Model.Title + " (My Version)";
+    var ingredientsList = Model.Ingredients.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+    var stepsList = Model.Instructions.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/recipe-details.css" asp-append-version="true" />
+}
+
+<div class="recipe-details-container my-4">
+    <div class="details-top-section">
+        <div class="details-image-box">
+            <img src="@Model.ThumbUrl" alt="@Model.Title" />
+        </div>
+
+        <div class="details-info-box">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-2">My Customized Version</span>
+            <h1 class="details-title">@Model.Title</h1>
+
+            <div class="details-tags-row">
+                @if (!string.IsNullOrEmpty(Model.Area))
+                {
+                    <span class="info-pill">🌍 Cuisine: <strong>@Model.Area</strong></span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
+                    <span class="info-pill">🏷️ Category: <strong>@Model.Category</strong></span>
+                }
+            </div>
+
+            <div class="details-ingredients-card mt-4">
+                <h3>My Personal Ingredients</h3>
+                <ul class="ingredients-list">
+                    @foreach (var ing in ingredientsList)
+                    {
+                        <li>
+                            <label class="ingredient-checkbox-label">
+                                <input type="checkbox" class="ingredient-checkbox" />
+                                <span class="checkbox-custom"></span>
+                                <span class="ingredient-text">@ing</span>
+                            </label>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-instructions-card my-5">
+        <h2>My Preparation Steps</h2>
+        <div class="steps-wrapper">
+            @{
+                int num = 1;
+            }
+            @foreach (var step in stepsList)
+            {
+                <div class="step-item">
+                    <div class="step-number">@num</div>
+                    <div class="step-text">@step</div>
+                </div>
+                num++;
+            }
+        </div>
+    </div>
+
+    <div class="details-actions my-5 text-center d-flex justify-content-center gap-3">
+        <a href="/Recipe/Saved" class="btn btn-dark rounded-pill px-4">&larr; Back to My Saved</a>
+        <a href="/Recipe/Details/@Model.ExternalMealId" class="btn btn-outline-dark rounded-pill px-4">View Original Recipe</a>
+    </div>
+</div>

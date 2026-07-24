@@ -112,3 +112,123 @@
 .current-user-row td {
     border: 2px solid var(--color-dark, #2D3142);
 }
+/* Wyszukiwarka */
+.community-search-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-input-wrapper {
+    border: 2px solid var(--color-dark, #2D3142);
+    border-radius: 50px;
+    overflow: hidden;
+    background: #FFFFFF;
+}
+
+.custom-search-input {
+    border: none;
+    padding: 12px 24px;
+    box-shadow: none !important;
+}
+
+.search-submit-btn {
+    border-radius: 0 50px 50px 0 !important;
+    padding: 0 28px;
+    font-weight: 600;
+}
+
+/* Siatka kart użytkowników */
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.user-card {
+    background: #FFFFFF;
+    border: 2px solid var(--color-dark, #2D3142);
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .user-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+.user-avatar-wrapper {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 16px;
+}
+
+.user-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid var(--color-dark, #2D3142);
+}
+
+.user-username {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--color-dark, #2D3142);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-reputation-badge {
+    display: inline-block;
+    background: var(--color-bg-light, #FAF6F0);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+/* Paginacja */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--color-dark, #2D3142);
+    color: var(--color-dark, #2D3142);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    .page-link-btn:hover {
+        background: #EAEAEA;
+        color: var(--color-dark, #2D3142);
+    }
+
+    .page-link-btn.active {
+        background: var(--color-dark, #2D3142);
+        color: #FFFFFF;
+    }
+
+.pagination-dots {
+    font-weight: 700;
+    color: #888;
+}

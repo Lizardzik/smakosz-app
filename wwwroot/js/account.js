@@ -34,3 +34,4 @@ document.addEventListener('DOMContentLoaded', function () {
         showForm('register');
     }
 });
+document.body.classList.remove('dark-theme');
